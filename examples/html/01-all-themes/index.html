@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Themes — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+  <div class="example-header">
+    <h1>All Themes</h1>
+    <p>Switch between all 10 built-in themes at runtime.</p>
+  </div>
+  <div class="control-panel">
+    <label for="themeSelect">Theme:</label>
+    <select id="themeSelect">
+      <option value="defaultTheme">Default (Light)</option>
+      <option value="darkTheme">Dark</option>
+      <option value="fintatechDarkTheme">Fintatech Dark</option>
+      <option value="beetTheme">Beet</option>
+      <option value="grayTheme">Gray</option>
+      <option value="oliveTheme">Olive</option>
+      <option value="orangeTheme">Orange</option>
+      <option value="purpleTheme">Purple</option>
+      <option value="skyTheme">Sky</option>
+      <option value="tealTheme">Teal</option>
+      <option value="customTheme">Custom (Blue/Gold)</option>
+    </select>
+  </div>
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/darkTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/fintatechDarkTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/beetTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/grayTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/oliveTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/orangeTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/purpleTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/skyTheme.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/tealTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    // Custom theme: deep-clone darkTheme, override key colors to Blue/Gold
+    var customTheme = JSON.parse(JSON.stringify(darkTheme));
+    customTheme.name = 'CustomBlueGold';
+    customTheme.chart.background = ['#0a1628', '#0a1628'];
+    customTheme.chart.border.strokeColor = '#1a2744';
+    customTheme.pane.grid.strokeColor = 'rgba(255, 255, 255, 0.05)';
+    customTheme.verticalScale.fill.fillColor = '#0d1b30';
+    customTheme.verticalScale.text.fillColor = '#8899bb';
+    customTheme.verticalScale.line.strokeColor = '#1a2744';
+    customTheme.horizontalScale.fill.fillColor = '#0d1b30';
+    customTheme.horizontalScale.text.fillColor = '#8899bb';
+    customTheme.horizontalScale.line.strokeColor = '#1a2744';
+    customTheme.crossHair.line.strokeColor = '#ffc107';
+    customTheme.crossHair.text.fillColor = '#000';
+    customTheme.crossHair.fill.fillColor = '#ffc107';
+    // Candle colors: gold up, blue down
+    var up = customTheme.plot.bar.candle.upCandle;
+    up.border.strokeColor = '#ffc107';
+    up.fill.fillColor = '#ffc107';
+    up.shadow.strokeColor = '#ffc107';
+    var down = customTheme.plot.bar.candle.downCandle;
+    down.border.strokeColor = '#3d7aed';
+    down.fill.fillColor = '#3d7aed';
+    down.shadow.strokeColor = '#3d7aed';
+
+    var themeMap = {
+      defaultTheme: defaultTheme,
+      darkTheme: darkTheme,
+      fintatechDarkTheme: fintatechDarkTheme,
+      beetTheme: beetTheme,
+      grayTheme: grayTheme,
+      oliveTheme: oliveTheme,
+      orangeTheme: orangeTheme,
+      purpleTheme: purpleTheme,
+      skyTheme: skyTheme,
+      tealTheme: tealTheme,
+      customTheme: customTheme,
+    };
+
+    // --- Chart ---
+    var chart = null;
+
+    function createChart(themeObj) {
+      if (chart) {
+        chart.dispose(true);
+        chart = null;
+      }
+      // Re-create container div (dispose removes it)
+      var el = document.getElementById('chartContainer');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'chartContainer';
+        document.body.appendChild(el);
+      }
+      chart = new FintaChart.Chart({
+        container: '#chartContainer',
+        datafeed: datafeed,
+        instrument: instrument,
+        timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+        theme: themeObj,
+        showToolbar: false,
+        showScrollbar: false,
+        supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+      });
+    }
+
+    createChart(defaultTheme);
+
+    // --- Controls ---
+    document.getElementById('themeSelect').addEventListener('change', function () {
+      var selected = this.value;
+      if (themeMap[selected]) {
+        createChart(themeMap[selected]);
+      }
+    });
+  </script>
+</body>
+</html>

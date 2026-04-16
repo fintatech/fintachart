@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State Management — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+  <div class="example-header">
+    <h1>State Management</h1>
+    <p>Save and restore the full chart state, indicators, and shapes using localStorage.</p>
+  </div>
+  <div class="control-panel">
+    <button id="btnSaveState">Save State</button>
+    <button id="btnRestoreState" class="secondary">Restore State</button>
+    <div class="separator"></div>
+    <button id="btnSaveIndicators">Save Indicators</button>
+    <button id="btnRestoreIndicators" class="secondary">Restore Indicators</button>
+    <div class="separator"></div>
+    <button id="btnSaveShapes">Save Shapes</button>
+    <button id="btnRestoreShapes" class="secondary">Restore Shapes</button>
+    <div class="separator"></div>
+    <button id="btnClearStorage" class="secondary">Clear Storage</button>
+    <span id="statusMsg" style="font-size: 12px; color: #666; margin-left: 8px;"></span>
+  </div>
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    var KEYS = {
+      state: 'tcd-example-state',
+      indicators: 'tcd-example-indicators',
+      shapes: 'tcd-example-shapes',
+    };
+
+    var statusEl = document.getElementById('statusMsg');
+    var statusTimer = null;
+
+    function showStatus(msg) {
+      statusEl.textContent = msg;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(function () { statusEl.textContent = ''; }, 3000);
+    }
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: true,
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Controls ---
+
+    // Save full chart state
+    document.getElementById('btnSaveState').addEventListener('click', function () {
+      var state = chart.saveState();
+      localStorage.setItem(KEYS.state, JSON.stringify(state));
+      showStatus('Full state saved.');
+    });
+
+    // Restore full chart state
+    document.getElementById('btnRestoreState').addEventListener('click', function () {
+      var raw = localStorage.getItem(KEYS.state);
+      if (!raw) { showStatus('No saved state found.'); return; }
+      chart.restoreState(JSON.parse(raw));
+      showStatus('Full state restored.');
+    });
+
+    // Save indicators state
+    document.getElementById('btnSaveIndicators').addEventListener('click', function () {
+      var state = chart.saveIndicatorsState();
+      localStorage.setItem(KEYS.indicators, JSON.stringify(state));
+      showStatus('Indicators state saved.');
+    });
+
+    // Restore indicators state
+    document.getElementById('btnRestoreIndicators').addEventListener('click', function () {
+      var raw = localStorage.getItem(KEYS.indicators);
+      if (!raw) { showStatus('No saved indicators found.'); return; }
+      chart.restoreIndicatorsState(JSON.parse(raw));
+      showStatus('Indicators state restored.');
+    });
+
+    // Save shapes state
+    document.getElementById('btnSaveShapes').addEventListener('click', function () {
+      var state = chart.saveShapesState();
+      localStorage.setItem(KEYS.shapes, JSON.stringify(state));
+      showStatus('Shapes state saved.');
+    });
+
+    // Restore shapes state
+    document.getElementById('btnRestoreShapes').addEventListener('click', function () {
+      var raw = localStorage.getItem(KEYS.shapes);
+      if (!raw) { showStatus('No saved shapes found.'); return; }
+      chart.restoreShapesState(JSON.parse(raw));
+      showStatus('Shapes state restored.');
+    });
+
+    // Clear all saved state from localStorage
+    document.getElementById('btnClearStorage').addEventListener('click', function () {
+      localStorage.removeItem(KEYS.state);
+      localStorage.removeItem(KEYS.indicators);
+      localStorage.removeItem(KEYS.shapes);
+      showStatus('Storage cleared.');
+    });
+  </script>
+</body>
+</html>

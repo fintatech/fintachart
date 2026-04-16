@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Data Simulation — Trading Chart Designer</title>
+
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body>
+
+  <div class="example-header">
+    <h1>Live Data Simulation</h1>
+    <p>Simulated REST history + real-time L1 ticks. Search instruments via the chart's toolbar.</p>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <script src="../shared/includes.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <script src="../shared/chart-config.js"></script>
+  <script>
+    'use strict';
+
+    // =======================================================================
+    // Instrument catalog
+    // =======================================================================
+
+    var instruments = [
+      { id: '1', symbol: 'EUR/USD', exchange: 'FOREX', type: 'FOREX', company: 'Euro / US Dollar',       tickSize: 0.00001, seedPrice: 1.0850  },
+      { id: '2', symbol: 'GBP/USD', exchange: 'FOREX', type: 'FOREX', company: 'British Pound / US Dollar', tickSize: 0.00001, seedPrice: 1.2650  },
+      { id: '3', symbol: 'USD/JPY', exchange: 'FOREX', type: 'FOREX', company: 'US Dollar / Japanese Yen',  tickSize: 0.001,   seedPrice: 155.50  },
+      { id: '4', symbol: 'EUR/GBP', exchange: 'FOREX', type: 'FOREX', company: 'Euro / British Pound',      tickSize: 0.00001, seedPrice: 0.8580  },
+      { id: '5', symbol: 'AAPL',    exchange: 'NASDAQ', type: 'Stock', company: 'Apple Inc.',                tickSize: 0.01,    seedPrice: 195.00  },
+      { id: '6', symbol: 'MSFT',    exchange: 'NASDAQ', type: 'Stock', company: 'Microsoft Corp.',           tickSize: 0.01,    seedPrice: 420.00  },
+      { id: '7', symbol: 'BTC/USD', exchange: 'CRYPTO', type: 'Crypto', company: 'Bitcoin / US Dollar',      tickSize: 0.01,    seedPrice: 67500.00 },
+      { id: '8', symbol: 'ETH/USD', exchange: 'CRYPTO', type: 'Crypto', company: 'Ethereum / US Dollar',     tickSize: 0.01,    seedPrice: 3400.00  },
+    ];
+
+    function findInstrument(symbol) {
+      for (var i = 0; i < instruments.length; i++) {
+        if (instruments[i].symbol === symbol) return instruments[i];
+      }
+      return instruments[0];
+    }
+
+    // =======================================================================
+    // Simulated REST API — generates random OHLCV history
+    // =======================================================================
+
+    function fetchHistory(symbol, periodicity, interval, count) {
+      var inst = findInstrument(symbol);
+      var seed = inst.seedPrice;
+      var volatility = seed * 0.001;
+
+      return new Promise(function (resolve) {
+        setTimeout(function () {
+          var bars = [];
+          var price = seed;
+          var now = Date.now();
+          var barMs = interval * ({ '': 60000, 'h': 3600000, 'd': 86400000 }[periodicity] || 60000);
+          var start = now - count * barMs;
+
+          for (var i = 0; i < count; i++) {
+            var open = price;
+            var c1 = (Math.random() - 0.48) * volatility;
+            var c2 = (Math.random() - 0.48) * volatility;
+            var close = open + c1;
+            var high = Math.max(open, close) + Math.abs(c2);
+            var low = Math.min(open, close) - Math.abs(c2) * 0.8;
+
+            bars.push({
+              date: new Date(start + i * barMs),
+              open: open, high: high, low: low, close: close,
+              volume: Math.floor(Math.random() * 200) + 50,
+            });
+            price = close;
+          }
+          resolve(bars);
+        }, 2000);
+      });
+    }
+
+    // =======================================================================
+    // L1 tick simulation — always running at 250ms
+    // =======================================================================
+
+    var chart;
+    var l1Timer = null;
+    var lastPrice = 0;
+    var refreshPending = false;
+
+    function getLastBar() {
+      var rows = chart.barDataRows();
+      if (!rows || rows.open.values.length === 0) return null;
+      return {
+        open: rows.open.lastValue, high: rows.high.lastValue,
+        low: rows.low.lastValue, close: rows.close.lastValue,
+        volume: rows.volume.lastValue, date: rows.date.lastValue,
+      };
+    }
+
+    function updateLastBar(bar) {
+      var rows = chart.barDataRows();
+      rows.open.updateLast(bar.open);
+      rows.high.updateLast(bar.high);
+      rows.low.updateLast(bar.low);
+      rows.close.updateLast(bar.close);
+      rows.volume.updateLast(bar.volume);
+      rows.date.updateLast(bar.date);
+      chart.invokeValueChanged(FintaChart.ChartEvent.LAST_BAR_UPDATED, bar);
+    }
+
+    function scheduleRefresh(autoScale) {
+      if (refreshPending) return;
+      refreshPending = true;
+      requestAnimationFrame(function () {
+        chart.refreshAsync(autoScale);
+        refreshPending = false;
+      });
+    }
+
+    function onTick(price, volume) {
+      var lastBar = getLastBar();
+      if (!lastBar) return;
+
+      var tickTime = Date.now();
+      var currentBarStart = lastBar.date.getTime();
+      var nextBarStart = currentBarStart + chart.timeInterval;
+
+      if (tickTime >= nextBarStart) {
+        while (tickTime >= nextBarStart + chart.timeInterval) {
+          nextBarStart += chart.timeInterval;
+        }
+
+        var bar = {
+          date: new Date(nextBarStart),
+          open: price, high: price, low: price, close: price, volume: volume,
+        };
+
+        var shouldAutoScroll =
+          typeof chart.horizontalScale.lastVisibleRecord === 'number' &&
+          chart.horizontalScale.lastVisibleRecord >= chart.recordsCount - 1;
+
+        chart.appendBars(bar);
+
+        if (shouldAutoScroll) {
+          chart.horizontalScale.firstVisibleRecord = chart.horizontalScale.firstVisibleIndex + 1;
+          chart.horizontalScale.lastVisibleRecord = chart.horizontalScale.lastVisibleIndex + 1;
+          chart.horizontalScale.applyAutoScroll(FintaChart.DataRowsUpdateKind.NEW_BAR);
+        }
+        scheduleRefresh(chart.primaryPane.moveKind === 'autoscaled');
+      } else {
+        lastBar.close = price;
+        lastBar.volume += volume;
+        lastBar.high = Math.max(price, lastBar.high);
+        lastBar.low = Math.min(price, lastBar.low);
+        updateLastBar(lastBar);
+        scheduleRefresh();
+      }
+    }
+
+    function startL1() {
+      stopL1();
+      var tickVol = lastPrice * 0.0002;
+      l1Timer = setInterval(function () {
+        lastPrice = Math.max(0.001, lastPrice + (Math.random() - 0.48) * tickVol);
+        onTick(lastPrice, Math.floor(Math.random() * 50) + 1);
+      }, 250);
+    }
+
+    function stopL1() {
+      if (l1Timer) { clearInterval(l1Timer); l1Timer = null; }
+    }
+
+    // =======================================================================
+    // Datafeed — routes chart requests to simulated REST, manages L1 lifecycle
+    // =======================================================================
+
+    var datafeed = {
+      send: function (request) {
+        var inst = request.instrument || request.chart.instrument;
+        var tf = request.chart.timeFrame;
+
+        // Stop L1 for previous instrument
+        stopL1();
+
+        request.chart.showWaitingBar();
+
+        fetchHistory(inst.symbol, tf.periodicity, tf.interval, 500).then(function (bars) {
+          request.chart.dataContext.clearBarDataRows();
+          request.chart.dataContext.appendBars(bars);
+          request.chart.canLoadMoreBars = false;
+
+          var total = bars.length;
+          request.chart.firstVisibleRecord = Math.max(0, total - 100);
+          request.chart.lastVisibleRecord = total + 20;
+
+          request.chart.hideWaitingBar();
+          request.chart.refreshAsync(true);
+
+          // Seed price and start L1
+          if (bars.length > 0) {
+            lastPrice = bars[bars.length - 1].close;
+          }
+          startL1();
+        });
+      },
+      cancel: function () {},
+      isBusy: function () { return false; },
+      dispose: function () { stopL1(); },
+      notifyCompareError: function () {},
+    };
+
+    // =======================================================================
+    // Chart init — instruments registered via searchInstruments callback
+    // =======================================================================
+
+    chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instruments[0],
+      timeFrame: { interval: 1, periodicity: '' },
+      theme: defaultTheme,
+      showToolbar: true,
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes'],
+
+    });
+
+    // Override Instrument.filter — this is how the chart's built-in search finds instruments.
+    // The toolbar calls this when the user types in the instrument search box.
+    FintaChart.Instrument.filter = function (symbol, filters, page, size) {
+      var q = (symbol || '').toLowerCase();
+      var results = instruments.filter(function (inst) {
+        var matchesQuery = !q ||
+          inst.symbol.toLowerCase().indexOf(q) >= 0 ||
+          inst.company.toLowerCase().indexOf(q) >= 0;
+        var matchesExchange = !filters || !filters.length ||
+          filters.indexOf(inst.exchange) >= 0;
+        return matchesQuery && matchesExchange;
+      });
+      return Promise.resolve(results);
+    };
+
+    FintaChart.Instrument.filterById = function (id) {
+      var inst = instruments.filter(function (i) { return i.id === id; })[0];
+      return Promise.resolve(inst || instruments[0]);
+    };
+
+    // Provide exchange list for the search filter tabs
+    chart.exchanges = function () { return ['FOREX', 'NASDAQ', 'CRYPTO']; };
+  </script>
+</body>
+</html>

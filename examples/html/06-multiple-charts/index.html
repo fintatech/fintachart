@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Charts — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+
+  <style>
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      width: 100%;
+      height: calc(100vh - 52px);
+      gap: 2px;
+      background: #e0e0e0;
+    }
+    .chart-cell {
+      overflow: hidden;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="example-header">
+    <h1>Multiple Charts</h1>
+    <p>2x2 grid with four independent chart instances — different instruments and timeframes, each with its own toolbar.</p>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-cell" id="c1"></div>
+    <div class="chart-cell" id="c2"></div>
+    <div class="chart-cell" id="c3"></div>
+    <div class="chart-cell" id="c4"></div>
+  </div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+
+    function makeChart(selector, instrumentKey, timeFrame) {
+      return new Promise(function (resolve) {
+        $(selector).FintaChart({
+          chartContainer: selector,
+          width: '100%',
+          height: '100%',
+          theme: defaultTheme,
+          datafeed: datafeed,
+          instrument: fileDatafeedConfig.instruments[instrumentKey].instrument,
+          supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+          timeFrame: timeFrame,
+          fullWindowMode: false,
+          showToolbar: false,
+          showScrollbar: false,
+        });
+        setTimeout(resolve, 500);
+      });
+    }
+
+    // --- Charts ---
+    makeChart('#c1', 'EUR/CAD', { interval: 1, periodicity: FintaChart.Periodicity.DAY })
+      .then(function () { return makeChart('#c2', 'EUR/GBP', { interval: 1, periodicity: FintaChart.Periodicity.HOUR }); })
+      .then(function () { return makeChart('#c3', 'EUR/GBP', { interval: 4, periodicity: FintaChart.Periodicity.HOUR }); })
+      .then(function () { return makeChart('#c4', 'EUR/CAD', { interval: 15, periodicity: FintaChart.Periodicity.MINUTE }); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Custom Indicator — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body>
+
+  <div class="example-header">
+    <h1>Custom Indicator</h1>
+    <p>Build a custom EMA crossover indicator by extending FintaChart.Indicator.</p>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // =========================================================================
+    // MyCustomIndicator -- EMA Crossover
+    //
+    // Plots a fast EMA (9) and a slow EMA (21) as an overlay on the price panel.
+    // Uses the same patterns as built-in indicators (SMA, EMA, etc.):
+    //   - addPlot()      to create a plot line
+    //   - this.values     to access output data rows
+    //   - this.input       to read input bar values
+    // =========================================================================
+
+    /**
+     * Every custom indicator needs:
+     *   - static get type()          -- unique string identifier
+     *   - onResetDefaults()          -- set name, period, create plots
+     *   - onInitializeIndicator()    -- reset calculation state per recalc
+     *   - onInputTick()              -- called per bar, compute and set values
+     */
+    function MyCustomIndicator() {
+      FintaChart.Indicator.apply(this, arguments);
+    }
+
+    // Inherit from Indicator
+    MyCustomIndicator.prototype = Object.create(FintaChart.Indicator.prototype);
+    MyCustomIndicator.prototype.constructor = MyCustomIndicator;
+
+    // Unique type identifier
+    Object.defineProperty(MyCustomIndicator, 'type', {
+      get: function () { return 'EMACrossover'; }
+    });
+
+    /**
+     * onResetDefaults -- called on creation and when resetting to defaults.
+     * Set the indicator name, mark it as an overlay, and create plot lines.
+     * addPlot(color, name) creates a named data row + plot line on the chart.
+     */
+    MyCustomIndicator.prototype.onResetDefaults = function () {
+      this.name = 'EMA Crossover';
+      this.isOverlay = true;
+
+      // Create two plot lines: Fast (blue) and Slow (red)
+      this.addPlot('#3b82f6', 'Fast');
+      this.addPlot('#ef4444', 'Slow');
+    };
+
+    /**
+     * onInitializeIndicator -- called before each full recalculation.
+     * Reset any internal accumulators here.
+     */
+    MyCustomIndicator.prototype.onInitializeIndicator = function () {
+      this._fastEma = 0;
+      this._slowEma = 0;
+      this._priorFast = 0;
+      this._priorSlow = 0;
+    };
+
+    /**
+     * onInputTick -- called once per bar in chronological order.
+     * this.input.get(0) = current bar's close value
+     * this.currentBar   = current bar index (0-based)
+     * this.firstTickOfBar = true on the first tick of a new bar
+     * this.values.get(name) = data row for a named plot
+     * values.set(value) = set the current bar's output value
+     */
+    MyCustomIndicator.prototype.onInputTick = function () {
+      var FAST_PERIOD = 9;
+      var SLOW_PERIOD = 21;
+
+      var fastK = 2 / (FAST_PERIOD + 1);
+      var slowK = 2 / (SLOW_PERIOD + 1);
+
+      var close = this.input.get(0);
+
+      // Save prior values on new bar
+      if (this.firstTickOfBar) {
+        this._priorFast = this._fastEma;
+        this._priorSlow = this._slowEma;
+      }
+
+      // Seed or calculate EMA
+      if (this.currentBar === 0) {
+        this._fastEma = close;
+        this._slowEma = close;
+      } else {
+        this._fastEma = close * fastK + this._priorFast * (1 - fastK);
+        this._slowEma = close * slowK + this._priorSlow * (1 - slowK);
+      }
+
+      // Write values to the named plot data rows
+      this.values.get('Fast').set(this._fastEma);
+      this.values.get('Slow').set(this._slowEma);
+    };
+
+    // Register so the chart can find it by type string
+    FintaChart.IndicatorFactory.add(MyCustomIndicator);
+
+    // =========================================================================
+    // Chart initialisation
+    // =========================================================================
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // Auto-add the custom indicator
+    chart.addIndicators({ type: 'EMACrossover' });
+  </script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+/* Shared base styles for FintaChart examples */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+/* Example header */
+.example-header {
+  padding: 12px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  min-height: 52px;
+}
+
+.example-header h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a2e;
+  white-space: nowrap;
+}
+
+.example-header p {
+  font-size: 13px;
+  color: #666;
+  flex: 1;
+}
+
+/* Chart container — fills remaining viewport */
+#chartContainer {
+  width: 100%;
+  height: calc(100vh - 52px);
+}
+
+/* When using control panel, chart is smaller */
+.has-controls #chartContainer {
+  height: calc(100vh - 52px - 48px);
+}
+
+/* Control panel */
+.control-panel {
+  padding: 8px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-height: 48px;
+}
+
+.control-panel label,
+.control-panel .group-label {
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.control-panel select,
+.control-panel button {
+  font-size: 13px;
+  padding: 4px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+}
+
+.control-panel select:hover,
+.control-panel button:hover {
+  border-color: #999;
+}
+
+.control-panel button {
+  background: #6366f1;
+  color: #fff;
+  border-color: #6366f1;
+}
+
+.control-panel button:hover {
+  background: #5558e6;
+}
+
+.control-panel button.secondary {
+  background: #fff;
+  color: #333;
+  border-color: #ccc;
+}
+
+.control-panel button.secondary:hover {
+  background: #f5f5f5;
+}
+
+.control-panel .separator {
+  width: 1px;
+  height: 24px;
+  background: #e0e0e0;
+  margin: 0 4px;
+}
+
+/* Event log panel */
+.event-log {
+  position: fixed;
+  right: 0;
+  top: 52px;
+  width: 320px;
+  bottom: 0;
+  background: #1a1a2e;
+  color: #a0a0b4;
+  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-size: 11px;
+  overflow-y: auto;
+  padding: 8px;
+  z-index: 100;
+}
+
+.event-log .log-entry {
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.event-log .log-entry .event-name {
+  color: #6366f1;
+}
+
+.event-log .log-entry .event-time {
+  color: #555;
+  margin-right: 8px;
+}
+
+.has-event-log #chartContainer {
+  width: calc(100% - 320px);
+}
+
+/* Multi-chart grid */
+.chart-grid {
+  display: grid;
+  width: 100%;
+  height: calc(100vh - 52px);
+}
+
+.chart-grid-2x2 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.chart-grid .chart-cell {
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}

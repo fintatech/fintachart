@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programmatic API — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+
+  <div class="example-header">
+    <h1>Programmatic API</h1>
+    <p>Control the chart through its public API: navigation, zoom, display toggles, and export.</p>
+  </div>
+
+  <div class="control-panel">
+    <span class="group-label">Navigation</span>
+    <button id="btnScrollLeft">Scroll Left</button>
+    <button id="btnScrollRight">Scroll Right</button>
+    <button id="btnZoomIn">Zoom In</button>
+    <button id="btnZoomOut">Zoom Out</button>
+    <div class="separator"></div>
+    <span class="group-label">Actions</span>
+    <button id="btnAutoScale">Auto Scale</button>
+    <button id="btnExportCSV">Export CSV</button>
+    <button id="btnSaveImage">Save Image</button>
+    <div class="separator"></div>
+    <span class="group-label">Display</span>
+    <button id="btnToggleOHLC">Toggle OHLC</button>
+    <button id="btnFullWindow">Full Window</button>
+    <button id="btnToggleGridX">Toggle Grid X</button>
+    <button id="btnToggleGridY">Toggle Grid Y</button>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Controls ---
+
+    // Navigation
+    document.getElementById('btnScrollLeft').addEventListener('click', function() {
+      chart.scrollPixels(100);
+      chart.refreshAsync(true);
+    });
+    document.getElementById('btnScrollRight').addEventListener('click', function() {
+      chart.scrollPixels(-100);
+      chart.refreshAsync(true);
+    });
+    document.getElementById('btnZoomIn').addEventListener('click', function() {
+      chart.zoomPixels(100);
+      chart.refreshAsync(true);
+    });
+    document.getElementById('btnZoomOut').addEventListener('click', function() {
+      chart.zoomPixels(-100);
+      chart.refreshAsync(true);
+    });
+
+    // Actions
+    document.getElementById('btnAutoScale').addEventListener('click', function() {
+      chart.refreshAutoScaleAllAsync();
+      chart.refreshAsync(true);
+    });
+    document.getElementById('btnExportCSV').addEventListener('click', function() {
+      chart.exportChartData();
+    });
+    document.getElementById('btnSaveImage').addEventListener('click', function() {
+      chart.saveImage();
+    });
+
+    // Display toggles
+    document.getElementById('btnToggleOHLC').addEventListener('click', function() {
+      chart.ohlcShowed = !chart.ohlcShowed;
+    });
+    document.getElementById('btnFullWindow').addEventListener('click', function() {
+      var isNormal = chart.windowMode === 'normal';
+      chart.setWindowMode(isNormal ? 'full-window' : 'normal');
+      this.textContent = isNormal ? 'Exit Full Window' : 'Full Window';
+    });
+    // Escape key exits full window mode
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && chart.windowMode !== 'normal') {
+        chart.setWindowMode('normal');
+        document.getElementById('btnFullWindow').textContent = 'Full Window';
+      }
+    });
+    document.getElementById('btnToggleGridX').addEventListener('click', function() {
+      chart.gridX = !chart.gridX;
+      chart.refreshAsync(true);
+    });
+    document.getElementById('btnToggleGridY').addEventListener('click', function() {
+      chart.gridY = !chart.gridY;
+      chart.refreshAsync(true);
+    });
+  </script>
+</body>
+</html>

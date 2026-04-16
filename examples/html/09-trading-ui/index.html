@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading UI — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body>
+  <div class="example-header">
+    <h1>Trading UI</h1>
+    <p>Orders, alerts, and positions overlaid on a dark-themed chart with context-menu order placement.</p>
+  </div>
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/fintatechDarkTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: fintatechDarkTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+      contextMenuPlacingOrdersEnabled: true,
+      tradeHandler: function (params) {
+        alert('Trade request:\n' + JSON.stringify(params, null, 2));
+      },
+    });
+
+    // Wait a short moment for bars to load, then add sample trading objects
+    setTimeout(function () {
+      // Get the last bar's close price as reference
+      var lastIdx = chart.recordsCount - 1;
+      if (lastIdx < 0) return;
+      var lastBar = chart.dataContext.bar(lastIdx);
+      if (!lastBar) return;
+      var price = lastBar.close;
+
+      // --- OrderBar: a pending Buy Limit order slightly below the current price ---
+      var orderBar = new FintaChart.OrderBar({
+        order: {
+          id: 'demo-order-1',
+          price: price - 0.0020,           // 20 pips below current price
+          action: FintaChart.OrderAction.BUY,
+          kind: FintaChart.OrderKind.LIMIT,
+          quantity: 10000,
+          state: FintaChart.OrderState.ACCEPTED,
+        },
+      });
+      chart.addOrder(orderBar);
+
+      // --- AlertBar: a price alert above the current price ---
+      var alertBar = new FintaChart.AlertBar({
+        Alert: {
+          id: 'demo-alert-1',
+          name: 'Price Alert',
+          message: 'EUR/GBP reached target',
+          value: price + 0.0030,            // 30 pips above current price
+        },
+      });
+      chart.addAlert(alertBar);
+
+      // --- PositionBar: an open long position at a price near the current level ---
+      var positionBar = new FintaChart.PositionBar({
+        position: {
+          id: 'demo-position-1',
+          price: price - 0.0010,            // entry price 10 pips below current
+          kind: FintaChart.PositionKind.LONG,
+          quantity: 25000,
+          plText: '+12.50',                 // sample P&L display text
+        },
+      });
+      chart.addPosition(positionBar);
+    }, 500);
+  </script>
+</body>
+</html>

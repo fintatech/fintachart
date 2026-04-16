@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trading Chart Designer — React + TypeScript Example</title>
+
+  <!-- Chart CSS -->
+  <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body, #root { width: 100%; height: 100%; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Chart framework dependencies (must load before React app) -->
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-ui.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery.ui.touch-punch.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/Intl.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/detectizr.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/dom-to-image-more.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/i18nextXHRBackend.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-i18next.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/bootstrap.v3.datetimepicker.min.js"></script>
+
+  <!-- Chart library -->
+  <script src="node_modules/@fintatech/fintachart/scripts/FintaChart.min.js"></script>
+
+  <!-- Theme -->
+  <script src="node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+
+  <!-- React app -->
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

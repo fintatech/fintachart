@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indicators — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+
+  <div class="example-header">
+    <h1>Indicators</h1>
+    <p>Add and remove technical indicators programmatically.</p>
+  </div>
+
+  <div class="control-panel">
+    <button id="btnAddSMA">Add SMA</button>
+    <button id="btnAddEMA">Add EMA</button>
+    <button id="btnAddBollinger">Add Bollinger</button>
+    <button id="btnAddMACD">Add MACD</button>
+    <button id="btnAddRSI">Add RSI</button>
+    <button id="btnAddVolume">Add Volume</button>
+    <div class="separator"></div>
+    <button id="btnRemoveAll" class="secondary">Remove All</button>
+    <div class="separator"></div>
+    <label>Active indicators: <strong id="indicatorCount">0</strong></label>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    var countEl = document.getElementById('indicatorCount');
+
+    function updateCount() {
+      countEl.textContent = chart.indicators.length;
+    }
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Controls ---
+    document.getElementById('btnAddSMA').addEventListener('click', function () {
+      chart.addIndicators({ type: 'SMA' });
+      updateCount();
+    });
+
+    document.getElementById('btnAddEMA').addEventListener('click', function () {
+      chart.addIndicators({ type: 'EMA' });
+      updateCount();
+    });
+
+    document.getElementById('btnAddBollinger').addEventListener('click', function () {
+      chart.addIndicators({ type: 'Bollinger' });
+      updateCount();
+    });
+
+    document.getElementById('btnAddMACD').addEventListener('click', function () {
+      chart.addIndicators({ type: 'MACD' });
+      updateCount();
+    });
+
+    document.getElementById('btnAddRSI').addEventListener('click', function () {
+      chart.addIndicators({ type: 'RSI' });
+      updateCount();
+    });
+
+    document.getElementById('btnAddVolume').addEventListener('click', function () {
+      chart.addIndicators({ type: 'VOLUME' });
+      updateCount();
+    });
+
+    document.getElementById('btnRemoveAll').addEventListener('click', function () {
+      chart.removeIndicators();
+      updateCount();
+    });
+  </script>
+</body>
+</html>

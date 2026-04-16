@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chart Types — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+  <div class="example-header">
+    <h1>Chart Types</h1>
+    <p>Switch between all 17 chart types at runtime.</p>
+  </div>
+  <div class="control-panel">
+    <label for="chartTypeSelect">Chart Type:</label>
+    <select id="chartTypeSelect">
+      <option value="candle">Candle</option>
+      <option value="hollowCandle">Hollow Candle</option>
+      <option value="heikinAshi">Heikin Ashi</option>
+      <option value="bar">OHLC Bar</option>
+      <option value="coloredBar">Colored OHLC Bar</option>
+      <option value="HLCBar">HLC Bar</option>
+      <option value="coloredHLCBar">Colored HLC Bar</option>
+      <option value="HLBar">HL Bar</option>
+      <option value="coloredHLBar">Colored HL Bar</option>
+      <option value="line">Line</option>
+      <option value="area">Area</option>
+      <option value="renko">Renko</option>
+      <option value="rangeBar">Range Bar</option>
+      <option value="lineBreak">Line Break</option>
+      <option value="pointAndFigure">Point &amp; Figure</option>
+      <option value="kagi">Kagi</option>
+      <option value="candleVolume">Candle Volume</option>
+      <option value="equiVolume">Equi Volume</option>
+      <option value="equiVolumeShadow">Equi Volume Shadow</option>
+    </select>
+  </div>
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Controls ---
+    document.getElementById('chartTypeSelect').addEventListener('change', function () {
+      chart.applyChartType(this.value);
+    });
+  </script>
+</body>
+</html>

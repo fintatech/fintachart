@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeframes — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+  <style>
+    .control-panel button.active {
+      background: #4338ca;
+      border-color: #4338ca;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="has-controls">
+
+  <div class="example-header">
+    <h1>Timeframes</h1>
+    <p>Switch between different timeframe intervals and periodicities.</p>
+  </div>
+
+  <div class="control-panel">
+    <label>Timeframe:</label>
+    <button class="tf-btn" data-interval="1" data-periodicity="MINUTE">1m</button>
+    <button class="tf-btn" data-interval="5" data-periodicity="MINUTE">5m</button>
+    <button class="tf-btn" data-interval="15" data-periodicity="MINUTE">15m</button>
+    <button class="tf-btn active" data-interval="1" data-periodicity="HOUR">1H</button>
+    <button class="tf-btn" data-interval="4" data-periodicity="HOUR">4H</button>
+    <button class="tf-btn" data-interval="1" data-periodicity="DAY">1D</button>
+    <button class="tf-btn" data-interval="1" data-periodicity="WEEK">1W</button>
+    <button class="tf-btn" data-interval="1" data-periodicity="MONTH">1M</button>
+    <div class="separator"></div>
+    <label>Current: <strong id="currentTF">1H</strong></label>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    var buttons = document.querySelectorAll('.tf-btn');
+    var displayEl = document.getElementById('currentTF');
+
+    var periodicityLabels = {};
+    periodicityLabels[FintaChart.Periodicity.MINUTE] = 'm';
+    periodicityLabels[FintaChart.Periodicity.HOUR] = 'H';
+    periodicityLabels[FintaChart.Periodicity.DAY] = 'D';
+    periodicityLabels[FintaChart.Periodicity.WEEK] = 'W';
+    periodicityLabels[FintaChart.Periodicity.MONTH] = 'M';
+
+    function formatTimeFrame(tf) {
+      return tf.interval + (periodicityLabels[tf.periodicity] || tf.periodicity);
+    }
+
+    function setActive(activeBtn) {
+      buttons.forEach(function(btn) { btn.classList.remove('active'); });
+      activeBtn.classList.add('active');
+    }
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month'],
+    });
+
+    // --- Controls ---
+    chart.on(FintaChart.ChartEvent.TIME_FRAME_CHANGED, function(event) {
+      displayEl.textContent = formatTimeFrame(event.value);
+    });
+
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var tf = {
+          interval: parseInt(btn.getAttribute('data-interval'), 10),
+          periodicity: FintaChart.Periodicity[btn.getAttribute('data-periodicity')],
+        };
+        chart.timeFrame = tf;
+        chart.sendBarsRequest();
+        setActive(btn);
+      });
+    });
+  </script>
+</body>
+</html>

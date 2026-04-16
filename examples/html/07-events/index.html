@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-event-log">
+  <div class="example-header">
+    <h1>Events</h1>
+    <p>Subscribe to chart events and see them logged in real time on the right panel.</p>
+  </div>
+  <div id="chartContainer"></div>
+  <div class="event-log" id="eventLog">
+    <div style="padding: 4px 0; color: #6366f1; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 4px;">Event Log</div>
+  </div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    var logPanel = document.getElementById('eventLog');
+
+    function logEvent(name, value) {
+      var now = new Date();
+      var time = now.toLocaleTimeString('en-US', { hour12: false }) + '.' +
+        String(now.getMilliseconds()).padStart(3, '0');
+
+      var summary = '';
+      if (value !== undefined && value !== null) {
+        try {
+          if (typeof value === 'object') {
+            // Extract a short summary from the value
+            if (value.symbol) summary = value.symbol;
+            else if (value.value !== undefined) summary = String(value.value);
+            else if (value.name) summary = value.name;
+            else summary = JSON.stringify(value).substring(0, 60);
+          } else {
+            summary = String(value).substring(0, 60);
+          }
+        } catch (e) {
+          summary = '(object)';
+        }
+      }
+
+      var entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML =
+        '<span class="event-time">' + time + '</span>' +
+        '<span class="event-name">' + name + '</span>' +
+        (summary ? ' <span style="color:#888;">' + summary + '</span>' : '');
+
+      logPanel.appendChild(entry);
+      logPanel.scrollTop = logPanel.scrollHeight;
+    }
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Event subscriptions ---
+    var CE = FintaChart.ChartEvent;
+
+    chart.on(CE.INSTRUMENT_CHANGED, function (event) {
+      logEvent('INSTRUMENT_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.CHART_TYPE_CHANGED, function (event) {
+      logEvent('CHART_TYPE_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.TIME_FRAME_CHANGED, function (event) {
+      logEvent('TIME_FRAME_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.INDICATOR_ADDED, function (event) {
+      logEvent('INDICATOR_ADDED', event && event.value);
+    });
+
+    chart.on(CE.INDICATOR_REMOVED, function (event) {
+      logEvent('INDICATOR_REMOVED', event && event.value);
+    });
+
+    chart.on(CE.THEME_CHANGED, function (event) {
+      logEvent('THEME_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.STATE_CHANGED, function (event) {
+      logEvent('STATE_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.HOVER_RECORD_CHANGED, function (event) {
+      logEvent('HOVER_RECORD_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.CROSS_HAIR_CHANGED, function (event) {
+      logEvent('CROSS_HAIR_CHANGED', event && event.value);
+    });
+
+    chart.on(CE.USER_SHAPE_STARTED, function (event) {
+      logEvent('USER_SHAPE_STARTED', event && event.value);
+    });
+
+    chart.on(CE.USER_SHAPE_FINISHED, function (event) {
+      logEvent('USER_SHAPE_FINISHED', event && event.value);
+    });
+
+    chart.on(CE.BARS_APPENDED, function (event) {
+      logEvent('BARS_APPENDED', event && event.value);
+    });
+
+    chart.on(CE.ZOOM_IN_STARTED, function (event) {
+      logEvent('ZOOM_IN_STARTED', event && event.value);
+    });
+
+    chart.on(CE.ZOOM_IN_FINISHED, function (event) {
+      logEvent('ZOOM_IN_FINISHED', event && event.value);
+    });
+
+    logEvent('READY', 'Chart initialized');
+  </script>
+</body>
+</html>

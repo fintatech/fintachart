@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drawing Tools — Trading Chart Designer</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+
+  <div class="example-header">
+    <h1>Drawing &amp; Fibonacci Tools</h1>
+    <p>Shapes, annotations, and Fibonacci analysis tools — added programmatically or drawn interactively.</p>
+  </div>
+
+  <div class="control-panel">
+    <span class="group-label">SHAPES</span>
+    <button id="btnArrowUp">Arrow Up</button>
+    <button id="btnArrowDown">Arrow Down</button>
+    <button id="btnLine">Line</button>
+    <button id="btnRect">Rectangle</button>
+    <button id="btnNote">Note</button>
+    <button id="btnDot">Dot</button>
+    <span class="separator"></span>
+    <span class="group-label">FIBONACCI</span>
+    <button id="btnRetracements">Retracements</button>
+    <button id="btnFan">Fan</button>
+    <button id="btnExtensions">Extensions</button>
+    <button id="btnArcs">Arcs</button>
+    <button id="btnTimeZones">Time Zones</button>
+    <span class="separator"></span>
+    <button id="btnDrawLine" class="secondary">Draw Line (interactive)</button>
+    <span class="separator"></span>
+    <button id="btnClear" class="secondary">Clear All</button>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // --- Datafeed ---
+    var datafeed = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    function dp(date, value) {
+      return new FintaChart.DataPoint({ date: date, value: value });
+    }
+
+    function addFibShape(ShapeCtor, date1, val1, date2, val2) {
+      var shape = new ShapeCtor();
+      shape.points[0] = dp(date1, val1);
+      shape.points[1] = dp(date2, val2);
+      chart.primaryPane.addShapes(shape);
+    }
+
+    // --- Chart ---
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.DAY },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: false,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // --- Shapes ---
+
+    document.getElementById('btnArrowUp').addEventListener('click', function () {
+      var shape = new FintaChart.ArrowUpShape();
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 8, 10), 0.885);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnArrowDown').addEventListener('click', function () {
+      var shape = new FintaChart.ArrowDownShape();
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 8, 20), 0.892);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnLine').addEventListener('click', function () {
+      var shape = new FintaChart.LineSegmentShape();
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 7, 1), 0.888);
+      shape.points[1] = dp(new Date(2018, 9, 1), 0.880);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnRect').addEventListener('click', function () {
+      var shape = new FintaChart.RectangleShape();
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 7, 15), 0.893);
+      shape.points[1] = dp(new Date(2018, 8, 15), 0.886);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnNote').addEventListener('click', function () {
+      var shape = new FintaChart.NoteShape({ text: 'Sample annotation' });
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 6, 15), 0.885);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnDot').addEventListener('click', function () {
+      var shape = new FintaChart.DotShape();
+      shape.locked = true;
+      shape.points[0] = dp(new Date(2018, 8, 25), 0.878);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    // --- Fibonacci ---
+
+    document.getElementById('btnRetracements').addEventListener('click', function () {
+      addFibShape(FintaChart.FibonacciRetracementsShape,
+        new Date(2018, 5, 1), 0.875, new Date(2018, 8, 1), 0.895);
+    });
+
+    document.getElementById('btnFan').addEventListener('click', function () {
+      addFibShape(FintaChart.FibonacciFanShape,
+        new Date(2018, 4, 1), 0.878, new Date(2018, 7, 15), 0.892);
+    });
+
+    document.getElementById('btnExtensions').addEventListener('click', function () {
+      var shape = new FintaChart.FibonacciExtensionsShape();
+      shape.points[0] = dp(new Date(2018, 3, 15), 0.870);
+      shape.points[1] = dp(new Date(2018, 5, 15), 0.892);
+      shape.points[2] = dp(new Date(2018, 6, 15), 0.882);
+      chart.primaryPane.addShapes(shape);
+    });
+
+    document.getElementById('btnArcs').addEventListener('click', function () {
+      addFibShape(FintaChart.FibonacciArcsShape,
+        new Date(2018, 5, 15), 0.876, new Date(2018, 8, 15), 0.893);
+    });
+
+    document.getElementById('btnTimeZones').addEventListener('click', function () {
+      addFibShape(FintaChart.FibonacciTimeZonesShape,
+        new Date(2018, 4, 15), 0.880, new Date(2018, 6, 1), 0.880);
+    });
+
+    // --- Interactive + Clear ---
+
+    document.getElementById('btnDrawLine').addEventListener('click', function () {
+      chart.startShape(new FintaChart.LineSegmentShape());
+    });
+
+    document.getElementById('btnClear').addEventListener('click', function () {
+      chart.removeShapes();
+      chart.refresh();
+    });
+  </script>
+</body>
+</html>
