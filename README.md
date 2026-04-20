@@ -1,9 +1,9 @@
 <div align="center">
   <a href="https://fintatech.com" target="_blank">
-    <img width="200" src="https://raw.githubusercontent.com/fintatech/fintachart/master/.github/logo-200x200.svg" alt="FintaChart logo">
+    <img width="400" src="https://raw.githubusercontent.com/fintatech/fintachart/master/.github/logo-200x200.svg" alt="FintaChart logo">
   </a>
 
-  <h1>FintaChart</h1>
+  <h1>FintaChart™ — Financial Charting Library</h1>
 
   [![npm version](https://img.shields.io/npm/v/@fintatech/fintachart.svg)](https://www.npmjs.com/package/@fintatech/fintachart)
 </div>
