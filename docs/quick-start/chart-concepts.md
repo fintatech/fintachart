@@ -1,6 +1,6 @@
 # Chart Concepts
 
-This page explains the core architecture and data model behind Trading Chart Designer. Understanding these concepts makes it easier to configure charts, build custom indicators, and work with the API.
+This page explains the core architecture and data model behind FintaChart. Understanding these concepts makes it easier to configure charts, build custom indicators, and work with the API.
 
 ## Architecture
 
@@ -80,7 +80,7 @@ Supported periodicity values:
 
 ## Chart Types
 
-Trading Chart Designer supports 17 chart types. Set the type through the `chartType` property:
+FintaChart supports 17 chart types. Set the type through the `chartType` property:
 
 ```javascript
 chart.chartType = 'candle';
@@ -108,7 +108,7 @@ chart.chartType = 'candle';
 
 ## Indicators
 
-Indicators are added through the `IndicatorFactory`. Trading Chart Designer ships with 95 built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
+Indicators are added through the `IndicatorFactory`. FintaChart ships with 95 built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
 
 ```javascript
 // Add a 20-period simple moving average to the price pane
@@ -144,7 +144,7 @@ Shapes are interactive by default: users can drag, resize, and delete them. Lock
 
 ## Themes
 
-Trading Chart Designer includes 10 built-in themes. Apply a theme globally or per chart:
+FintaChart includes 10 built-in themes. Apply a theme globally or per chart:
 
 ```javascript
 // Apply globally before creating charts
@@ -176,7 +176,7 @@ State objects work as portable templates. Save a state from one chart and apply 
 
 ## Events
 
-Trading Chart Designer uses an EventEmitter pattern for lifecycle and interaction events:
+FintaChart uses an EventEmitter pattern for lifecycle and interaction events:
 
 ```javascript
 // Subscribe to an event

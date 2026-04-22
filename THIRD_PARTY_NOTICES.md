@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Trading Chart Designer includes the following third-party libraries,
+FintaChart includes the following third-party libraries,
 all distributed under the MIT License:
 
 | Library | Version | License | URL |

@@ -9,12 +9,12 @@ See also: [Chart API](chart.md)
 ### Constructor
 
 ```ts
-new ChartContainer(parent: JQuery)
+new ChartContainer(parent: HTMLElement)
 ```
 
 | Parameter | Type | Description |
 |---|---|---|
-| `parent` | `JQuery` | The DOM container that will hold all chart elements. |
+| `parent` | `HTMLElement` | The DOM container that will hold all chart elements. |
 
 ### Accessors
 
@@ -24,7 +24,7 @@ new ChartContainer(parent: JQuery)
 | `shapeSettingsDragPane` | `ShapeSettingsDragPane` | readonly | The shared shape settings drag pane. |
 | `undoRedo` | `UndoRedoController` | readonly | The shared undo/redo controller. |
 | `containerDislocation` | `IContainerDislocation` | get / set | Width and height offsets used when computing full-window chart sizing. |
-| `parent` | `JQuery` | readonly | The parent DOM element. |
+| `parent` | `HTMLElement` | readonly | The parent DOM element. |
 | `scrollbar` | `Scrollbar` | readonly | The shared scrollbar instance. |
 | `toolbar` | `Toolbar` | readonly | The shared toolbar instance. |
 
@@ -89,7 +89,7 @@ When a user clicks (mousedown) on one of the charts in the container:
 ### Usage
 
 ```js
-const parent = $('#multi-chart-container');
+const parent = document.querySelector('#multi-chart-container');
 const container = new ChartContainer(parent);
 
 // Add charts with specific configs

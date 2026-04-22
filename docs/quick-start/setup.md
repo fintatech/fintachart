@@ -1,6 +1,6 @@
 # Setup
 
-This guide covers installing Trading Chart Designer and configuring the required resources.
+This guide covers installing FintaChart and configuring the required resources.
 
 ## Installation
 
@@ -38,7 +38,7 @@ If you use a module bundler (Webpack, Vite, etc.), import the CSS in your entry 
 
 ## Resource Path Configuration
 
-Trading Chart Designer loads dialog templates, localization files, and SVG icons at runtime. Point the library to the correct paths before creating a chart:
+FintaChart loads dialog templates, localization files, and SVG icons at runtime. Point the library to the correct paths before creating a chart:
 
 ```javascript
 FintaChart.ResourcePath.localization =
@@ -55,7 +55,7 @@ Adjust these paths to match your project's asset serving strategy. For example, 
 
 ## Data Adapter
 
-Trading Chart Designer requires a data adapter to supply market data (OHLCV bars, tick data, etc.). The adapter bridges your data source -- whether a REST API, WebSocket feed, or static file -- with the chart's internal data model.
+FintaChart requires a data adapter to supply market data (OHLCV bars, tick data, etc.). The adapter bridges your data source -- whether a REST API, WebSocket feed, or static file -- with the chart's internal data model.
 
 A minimal adapter implements methods for requesting historical bars and subscribing to real-time updates. See [Data Adapters](data-adapters.md) for a complete guide and examples.
 
