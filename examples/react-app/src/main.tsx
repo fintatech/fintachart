@@ -1,6 +1,6 @@
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
 
-// Note: StrictMode is disabled because FintaChart uses jQuery
-// and does not support double-invoked effects (mount → unmount → mount).
+// React.StrictMode is intentionally not enabled in this example for
+// compatibility. Production builds are unaffected.
 createRoot(document.getElementById('root')!).render(<App />);

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Chart Designer — React + TypeScript Example</title>
+  <title>FintaChart — React + TypeScript Example</title>
 
   <!-- Chart CSS -->
   <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
@@ -21,19 +21,23 @@
   <div id="root"></div>
 
   <!-- Chart framework dependencies (must load before React app) -->
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery.min.js"></script>
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-ui.min.js"></script>
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery.ui.touch-punch.min.js"></script>
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
   <script src="node_modules/@fintatech/fintachart/scripts/frameworks/Intl.min.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
   <script src="node_modules/@fintatech/fintachart/scripts/frameworks/detectizr.min.js"></script>
   <script src="node_modules/@fintatech/fintachart/scripts/frameworks/dom-to-image-more.min.js"></script>
   <script src="node_modules/@fintatech/fintachart/scripts/frameworks/i18nextXHRBackend.min.js"></script>
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-i18next.min.js"></script>
-  <script src="node_modules/@fintatech/fintachart/scripts/frameworks/bootstrap.v3.datetimepicker.min.js"></script>
+
+  <!-- UI plugins required by toolbar / dialogs / scrollbar -->
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks-modified/autocolumnlist.js"></script>
 
   <!-- Chart library -->
   <script src="node_modules/@fintatech/fintachart/scripts/FintaChart.min.js"></script>
+
+  <!-- Post-load plugins (spectrum / switchery / toastr / i18next hook into FintaChart) -->
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks-modified/spectrum.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks-modified/switchery.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks-modified/toastr.js"></script>
+  <script src="node_modules/@fintatech/fintachart/scripts/frameworks-modified/i18next.js"></script>
 
   <!-- Theme -->
   <script src="node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multiple Charts — Trading Chart Designer</title>
+  <title>Multiple Charts — FintaChart</title>
   <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
   <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
   <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
@@ -56,8 +56,8 @@
 
     function makeChart(selector, instrumentKey, timeFrame) {
       return new Promise(function (resolve) {
-        $(selector).FintaChart({
-          chartContainer: selector,
+        new FintaChart.Chart({
+          container: selector,
           width: '100%',
           height: '100%',
           theme: defaultTheme,
@@ -67,7 +67,7 @@
           timeFrame: timeFrame,
           fullWindowMode: false,
           showToolbar: false,
-          showScrollbar: false,
+          showScrollbar: true,
         });
         setTimeout(resolve, 500);
       });

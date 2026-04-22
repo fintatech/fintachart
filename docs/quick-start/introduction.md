@@ -1,6 +1,6 @@
 # Introduction
 
-Trading Chart Designer is a multi-platform financial charting component for web applications. It provides a complete, production-ready charting solution for trading platforms, financial dashboards, and any HTML-based project that needs interactive market data visualization.
+FintaChart is a multi-platform financial charting component for web applications. It provides a complete, production-ready charting solution for trading platforms, financial dashboards, and any HTML-based project that needs interactive market data visualization.
 
 ## Key Features
 
@@ -28,7 +28,7 @@ Trading Chart Designer is a multi-platform financial charting component for web 
 | Edge | 17+ |
 | Android Browser | 5+ |
 
-Trading Chart Designer uses HTML5 Canvas for rendering and does not require Flash or any other plugin.
+FintaChart uses HTML5 Canvas for rendering and does not require Flash or any other plugin.
 
 ## What's Next
 

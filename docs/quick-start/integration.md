@@ -1,6 +1,6 @@
 # Integration
 
-Trading Chart Designer runs wherever a modern browser engine is available: web platforms served directly in the browser, mobile apps using a WebView, and desktop apps built with Electron or similar frameworks.
+FintaChart runs wherever a modern browser engine is available: web platforms served directly in the browser, mobile apps using a WebView, and desktop apps built with Electron or similar frameworks.
 
 ## Basic HTML Integration
 
@@ -12,7 +12,7 @@ The simplest way to get a chart on screen is a standalone HTML page. The example
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trading Chart Designer</title>
+  <title>FintaChart</title>
   <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/FintaChart.min.css">
 </head>
 <body>
@@ -64,25 +64,6 @@ var chart = new FintaChart.Chart({
 
 The `config` object accepts all options documented in the [Chart API Reference](../api/chart.md).
 
-## jQuery Plugin
-
-If your project uses jQuery, Trading Chart Designer registers itself as a plugin:
-
-```javascript
-$('#chartContainer').FintaChart({
-  instrument: { symbol: 'BTCUSD', exchange: 'CRYPTO', tickSize: 0.01 },
-  timeFrame: { periodicity: 'hour', period: 1 },
-  chartType: 'candle',
-  theme: 'Dark'
-});
-```
-
-The plugin returns a jQuery object for chaining. Access the underlying chart instance through the element's data:
-
-```javascript
-var chart = $('#chartContainer').data('FintaChart');
-```
-
 ## Multi-Chart Layouts
 
 Use `ChartsContainer` to display multiple synchronized charts in a single view:
@@ -106,7 +87,7 @@ Charts within a container can share a time axis for synchronized scrolling, or o
 
 ## Angular Integration
 
-Trading Chart Designer can be wrapped in an Angular component. A typical approach:
+FintaChart can be wrapped in an Angular component. A typical approach:
 
 1. Install the npm package as a project dependency.
 2. Add the CSS to your `angular.json` styles array or import it in a global stylesheet.
@@ -147,7 +128,7 @@ Ensure the chart's `destroy()` method is called on component teardown to free ca
 
 ## Mobile Integration
 
-For mobile apps, embed Trading Chart Designer inside a WebView (Android WebView, iOS WKWebView, or a cross-platform equivalent).
+For mobile apps, embed FintaChart inside a WebView (Android WebView, iOS WKWebView, or a cross-platform equivalent).
 
 Key considerations:
 

@@ -48,12 +48,9 @@ npm install @fintatech/fintachart
 <link rel="stylesheet" href="node_modules/@fintatech/fintachart/css/FintaChart.min.css">
 
 <!-- 2. Framework dependencies -->
-<script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery.min.js"></script>
-<script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-ui.min.js"></script>
-<script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
 <script src="node_modules/@fintatech/fintachart/scripts/frameworks/Intl.min.js"></script>
+<script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
 <script src="node_modules/@fintatech/fintachart/scripts/frameworks/i18nextXHRBackend.min.js"></script>
-<script src="node_modules/@fintatech/fintachart/scripts/frameworks/jquery-i18next.min.js"></script>
 
 <!-- 3. Main bundle -->
 <script src="node_modules/@fintatech/fintachart/scripts/FintaChart.min.js"></script>

@@ -24,13 +24,18 @@ export function findInstrument(symbol: string): InstrumentWithSeed {
   return instruments.find(i => i.symbol === symbol) || instruments[0];
 }
 
-export function filterInstruments(query: string, exchange?: string): InstrumentWithSeed[] {
+export function findInstrumentById(id: string): InstrumentWithSeed {
+  return instruments.find(i => i.id === id) || instruments[0];
+}
+
+export function filterInstruments(query: string, exchanges?: string[]): InstrumentWithSeed[] {
   const q = (query || '').toLowerCase();
+  const filterSet = exchanges && exchanges.length ? new Set(exchanges) : null;
   return instruments.filter(inst => {
     const matchesQuery = !q
       || inst.symbol.toLowerCase().includes(q)
       || (inst.company || '').toLowerCase().includes(q);
-    const matchesExchange = !exchange || inst.exchange === exchange;
+    const matchesExchange = !filterSet || filterSet.has(inst.exchange);
     return matchesQuery && matchesExchange;
   });
 }

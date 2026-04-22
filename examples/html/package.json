@@ -6,6 +6,6 @@
     "serve": "npx serve ."
   },
   "dependencies": {
-    "@fintatech/fintachart": "3.1.0"
+    "@fintatech/fintachart": "3.1.1"
   }
 }

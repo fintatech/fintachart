@@ -368,7 +368,7 @@ Describes an HTML-based control. Extends `IControl`.
 
 | Property | Type | Description |
 |---|---|---|
-| `container` | `JQuery` | The parent jQuery container element. |
+| `container` | `HTMLElement` | The parent container element. |
 | `frame` | `Bounds` | The frame rectangle. |
 
 ---
@@ -381,7 +381,7 @@ Base class for controls backed by a DOM element. Extends `Control`, implements `
 
 | Accessor | Type | Access | Description |
 |---|---|---|---|
-| `container` | `JQuery` | get (public) / set (protected) | The jQuery container element. |
+| `container` | `HTMLElement` | get (public) / set (protected) | The container element. |
 | `frame` | `Bounds` | readonly | The current frame rectangle. |
 
 #### Methods
@@ -396,7 +396,7 @@ Base class for controls backed by a DOM element. Extends `Control`, implements `
 
 | Method | Returns | Description |
 |---|---|---|
-| `createContainer()` | `JQuery` | **Abstract.** Subclasses must return a new jQuery container element. |
+| `createContainer()` | `HTMLElement` | **Abstract.** Subclasses must return a new container element. |
 | `removeContainer()` | `void` | Removes and nullifies the container element. |
 
 ---
@@ -520,7 +520,7 @@ Describes a window-level event dispatched through the chart framework.
 
 | Property | Type | Description |
 |---|---|---|
-| `evt` | `JQueryEventObject` | The underlying jQuery event object. |
+| `evt` | `Event` | The underlying DOM event object. |
 | `pane` | `Pane` (optional) | The pane where the event originated, if applicable. |
 | `pointerPosition` | `IPoint` | The pointer position in chart coordinates. |
 | `stopPropagation` | `boolean` | Set to `true` to prevent further event handling. |
@@ -665,27 +665,27 @@ A collection of `MotionEvent` instances that dispatches window events to all con
 
 ### CheckBox
 
-Static helper for jQuery checkbox elements.
+Static helper for checkbox elements.
 
 | Method | Returns | Description |
 |---|---|---|
-| `CheckBox.checked(control: JQuery)` | `boolean` | Returns whether the checkbox is checked. |
-| `CheckBox.check(control: JQuery, value: boolean)` | `void` | Sets the checked state. |
+| `CheckBox.checked(control: HTMLInputElement)` | `boolean` | Returns whether the checkbox is checked. |
+| `CheckBox.check(control: HTMLInputElement, value: boolean)` | `void` | Sets the checked state. |
 
 ---
 
 ### NumericField
 
-Static helper for the `jqNumericField` jQuery plugin.
+Static helper for numeric input fields.
 
 | Method | Returns | Description |
 |---|---|---|
-| `NumericField.getValue(control: JQuery)` | `number` | Gets the current numeric value. |
-| `NumericField.setValue(control: JQuery, value: number)` | `void` | Sets the numeric value. |
+| `NumericField.getValue(control: HTMLElement)` | `number` | Gets the current numeric value. |
+| `NumericField.setValue(control: HTMLElement, value: number)` | `void` | Sets the numeric value. |
 
 ### INumericFieldConfig
 
-Configuration for the `jqNumericField` jQuery plugin.
+Configuration for the numeric field control.
 
 | Property | Type | Description |
 |---|---|---|
@@ -707,7 +707,7 @@ A custom styled dropdown (select) control. Implements `IDisposable`.
 
 | Parameter | Type | Description |
 |---|---|---|
-| `container` | `JQuery` | A jQuery `<select>` element to enhance. The original element is hidden and replaced by the styled dropdown. |
+| `container` | `HTMLSelectElement` | A `<select>` element to enhance. The original element is hidden and replaced by the styled dropdown. |
 
 #### Methods
 

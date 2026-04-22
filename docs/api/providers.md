@@ -564,7 +564,7 @@ Builds the popup DOM element shown when the user clicks on an event marker. Over
 
 ```typescript
 interface IMarketEventPopupBuilder {
-  createPopupElement(event: IMarketEvent, chart: Chart): Promise<JQuery>;
+  createPopupElement(event: IMarketEvent, chart: Chart): Promise<HTMLElement>;
 }
 ```
 
@@ -572,20 +572,23 @@ interface IMarketEventPopupBuilder {
 
 | Method | Returns | Description |
 |---|---|---|
-| `createPopupElement(event, chart)` | `Promise<JQuery>` | Creates and returns a jQuery-wrapped DOM element for the event popup. |
+| `createPopupElement(event, chart)` | `Promise<HTMLElement>` | Creates and returns a DOM element for the event popup. |
 
 #### Implementation Example
 
 ```typescript
 const popupBuilder: FintaChart.IMarketEventPopupBuilder = {
   async createPopupElement(event, chart) {
-    const $popup = $('<div class="custom-event-popup"></div>');
-    $popup.append(`<h4>${event.title}</h4>`);
-    $popup.append(`<span>${new Date(event.time).toLocaleString()}</span>`);
+    const popup = document.createElement('div');
+    popup.className = 'custom-event-popup';
+    popup.innerHTML = `
+      <h4>${event.title}</h4>
+      <span>${new Date(event.time).toLocaleString()}</span>
+    `;
 
     if (event.type === FintaChart.MarketEventType.ECONOMICAL) {
       const econ = event as FintaChart.IEconomicalMarketEvent;
-      $popup.append(`
+      popup.insertAdjacentHTML('beforeend', `
         <table>
           <tr><td>Actual</td><td>${econ.actual}</td></tr>
           <tr><td>Consensus</td><td>${econ.consensus}</td></tr>
@@ -594,7 +597,7 @@ const popupBuilder: FintaChart.IMarketEventPopupBuilder = {
       `);
     }
 
-    return $popup;
+    return popup;
   },
 };
 

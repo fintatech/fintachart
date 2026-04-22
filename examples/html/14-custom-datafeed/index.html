@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Data Simulation — Trading Chart Designer</title>
+  <title>Live Data Simulation — FintaChart</title>
 
   <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
   <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
@@ -178,43 +178,46 @@
     }
 
     // =======================================================================
-    // Datafeed — routes chart requests to simulated REST, manages L1 lifecycle
+    // Datafeed — extends FintaChart.DatafeedBase so compare-instrument requests
+    // get stored under the compare symbol's prefix (appendInstrumentBars) and
+    // BARS_SETTED / refreshIndicators / preserveAutoScaling fire correctly.
     // =======================================================================
 
-    var datafeed = {
-      send: function (request) {
+    class SimulatedDatafeed extends FintaChart.DatafeedBase {
+      send(request) {
+        // Register request + show spinner.
+        super.send(request);
+
+        var self = this;
         var inst = request.instrument || request.chart.instrument;
         var tf = request.chart.timeFrame;
+        // Only reset L1 when the PRIMARY instrument is being (re)loaded.
+        // Compare requests must not stop the primary tick stream.
+        var isPrimary = !request.instrument ||
+          request.instrument.symbol === request.chart.instrument.symbol;
+        if (isPrimary) stopL1();
 
-        // Stop L1 for previous instrument
+        fetchHistory(inst.symbol, tf.periodicity, tf.interval, request.count || 500)
+          .then(function (bars) {
+            // Drop stale responses (e.g. user switched again mid-fetch).
+            if (!self.isBusy(request)) return;
+
+            self.onCompleteRequest(request, bars);
+
+            if (isPrimary && bars.length > 0) {
+              lastPrice = bars[bars.length - 1].close;
+              startL1();
+            }
+          });
+      }
+
+      dispose() {
         stopL1();
+        super.dispose();
+      }
+    }
 
-        request.chart.showWaitingBar();
-
-        fetchHistory(inst.symbol, tf.periodicity, tf.interval, 500).then(function (bars) {
-          request.chart.dataContext.clearBarDataRows();
-          request.chart.dataContext.appendBars(bars);
-          request.chart.canLoadMoreBars = false;
-
-          var total = bars.length;
-          request.chart.firstVisibleRecord = Math.max(0, total - 100);
-          request.chart.lastVisibleRecord = total + 20;
-
-          request.chart.hideWaitingBar();
-          request.chart.refreshAsync(true);
-
-          // Seed price and start L1
-          if (bars.length > 0) {
-            lastPrice = bars[bars.length - 1].close;
-          }
-          startL1();
-        });
-      },
-      cancel: function () {},
-      isBusy: function () { return false; },
-      dispose: function () { stopL1(); },
-      notifyCompareError: function () {},
-    };
+    var datafeed = new SimulatedDatafeed();
 
     // =======================================================================
     // Chart init — instruments registered via searchInstruments callback

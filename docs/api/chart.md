@@ -1,6 +1,6 @@
 # Chart
 
-`Chart` is the central class of Trading Chart Designer. It extends [EventEmitter](event-emitter.md) and manages data, indicators, shapes, scales, panes, themes, and trading objects. All interaction with the charting library starts with creating a `Chart` instance.
+`Chart` is the central class of FintaChart. It extends [EventEmitter](event-emitter.md) and manages data, indicators, shapes, scales, panes, themes, and trading objects. All interaction with the charting library starts with creating a `Chart` instance.
 
 ```
 FintaChart.Chart  extends  EventEmitter  implements  IDisposable, IStateable<any>
@@ -97,7 +97,7 @@ Get/set properties exposed on a `Chart` instance.
 |----------|------|--------|-------------|
 | `panes` | `Pane[]` | get | All panes (primary + indicator panes). See [Panes](panes.md). |
 | `panesContainer` | `PanesContainer` | get | The internal panes-container manager. |
-| `container` | `JQuery` | get | The root container JQuery element. |
+| `container` | `HTMLElement` | get | The root container element. |
 | `primaryPane` | `Pane` | get | The main (primary) price pane. |
 | `size` | `ISize` | get/set | Pixel dimensions `{ width, height }` of the chart root div. |
 | `cssSize` | `ICssSize` | get/set | CSS dimensions (may contain `'%'` strings). |
@@ -1136,14 +1136,14 @@ Set the hovered chart object.
 #### localize
 
 ```typescript
-localize(element?: JQuery): void
+localize(element?: HTMLElement): void
 ```
 
 Trigger localization on the chart or a specific element.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `element` | `JQuery` *(optional)* | Element to localize. Defaults to the entire chart. |
+| `element` | `HTMLElement` *(optional)* | Element to localize. Defaults to the entire chart. |
 
 ---
 
