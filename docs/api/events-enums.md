@@ -237,27 +237,29 @@ Pre-computed millisecond constants for common durations.
 
 ### ChartTypeNames
 
-String constants identifying each built-in chart type.
+String constants identifying each built-in chart type. The full table with values and categories is in [chart-types.md](chart-types.md#charttypenames-constants); this is the same set, summarized.
 
-| Constant | Description |
-|---|---|
-| `CANDLE` | Japanese candlestick chart. |
-| `HEIKIN_ASHI` | Heikin-Ashi candles. |
-| `HOLLOW_CANDLE` | Hollow candlestick chart. |
-| `BAR` | OHLC bar chart. |
-| `COLORED_BAR` | OHLC bar chart with up/down coloring. |
-| `LINE` | Simple line chart. |
-| `MOUNTAIN` | Filled area (mountain) chart. |
-| `STEP_LINE` | Step-line chart. |
-| `DOT` | Dot chart. |
-| `DASH` | Dash chart. |
-| `RENKO` | Renko chart. |
-| `LINE_BREAK` | Line-break chart. |
-| `RANGE_BARS` | Range bar chart. |
-| `KAGI` | Kagi chart. |
-| `POINT_AND_FIGURE` | Point & Figure chart. |
-| `EQUI_VOLUME` | Equi-volume chart. |
-| `VOLUME_CANDLE` | Volume-weighted candle chart. |
+| Constant | Value | Description |
+|---|---|---|
+| `OHLC` | `'OHLC'` | Open / High / Low / Close bar chart. |
+| `COLORED_OHLC` | `'coloredOHLC'` | OHLC bar chart with up/down coloring. |
+| `HLC` | `'HLC'` | High / Low / Close bar chart. |
+| `COLORED_HLC` | `'coloredHLC'` | HLC bar chart with up/down coloring. |
+| `HL` | `'HL'` | High / Low bar chart. |
+| `COLORED_HL` | `'coloredHL'` | HL bar chart with up/down coloring. |
+| `CANDLE` | `'candle'` | Japanese candlestick chart. |
+| `HOLLOW_CANDLE` | `'hollowCandle'` | Hollow candlestick chart. |
+| `HEIKIN_ASHI` | `'heikinAshi'` | Heikin-Ashi candles. |
+| `RENKO` | `'renko'` | Renko chart. |
+| `RANGE_BAR` | `'rangeBar'` | Range bar chart. |
+| `LINE_BREAK` | `'lineBreak'` | Line-break chart. |
+| `POINT_AND_FIGURE` | `'pointAndFigure'` | Point & Figure chart. |
+| `KAGI` | `'kagi'` | Kagi chart. |
+| `CANDLE_VOLUME` | `'candleVolume'` | Volume-weighted candlestick chart. |
+| `EQUI_VOLUME` | `'equiVolume'` | Equi-volume chart. |
+| `EQUI_VOLUME_SHADOW` | `'equiVolumeShadow'` | Equi-volume chart with shadow. |
+| `LINE` | `'line'` | Simple line chart. |
+| `AREA` | `'area'` | Filled-area line chart. |
 
 ---
 

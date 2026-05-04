@@ -16,6 +16,7 @@ var fileDatafeedConfig = {
 
     'EUR/GBP': {
       instrument: {
+        id: 'eur-gbp',
         symbol: 'EUR/GBP',
         exchange: 'FOREX',
         type: 'FOREX',
@@ -37,6 +38,7 @@ var fileDatafeedConfig = {
 
     'EUR/CAD': {
       instrument: {
+        id: 'eur-cad',
         symbol: 'EUR/CAD',
         exchange: 'FOREX',
         type: 'FOREX',

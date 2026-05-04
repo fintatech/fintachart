@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrument Switching — FintaChart</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body class="has-controls">
+  <div class="example-header">
+    <h1>Instrument Switching</h1>
+    <p>Programmatic instrument changes — assign <code>chart.instrument</code>, then flush with <code>sendBarsRequest()</code>. Each instrument carries a unique <code>id</code> so the setter's equality check sees a real change and emits <code>INSTRUMENT_CHANGED</code>.</p>
+  </div>
+  <div class="control-panel">
+    <label>Instrument:</label>
+    <button data-key="EUR/GBP" type="button">EUR/GBP</button>
+    <button data-key="EUR/CAD" type="button">EUR/CAD</button>
+    <span id="status" style="margin-left: 16px; font-family: monospace;"></span>
+  </div>
+  <div id="chartContainer"></div>
+  <div id="eventLog" style="margin: 8px 16px; padding: 8px; max-height: 120px; overflow-y: auto; background: #f5f5f5; border: 1px solid #ddd; font-family: monospace; font-size: 12px;"></div>
+
+  <script src="../shared/includes.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <script src="../shared/file-data-adapter.js"></script>
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // The bundled file adapter populates `id` on every instrument
+    // (see shared/file-data-adapter.js), so we can use the configured
+    // instances directly. Identity in FintaChart is keyed off `id` —
+    // see docs/api/instrument.md ("Identity & equality").
+    var instruments = fileDatafeedConfig.instruments;
+
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: fileDatafeed,
+      instrument: instruments['EUR/GBP'].instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Hour', '4 Hours', '1 Day'],
+    });
+
+    // Listen for INSTRUMENT_CHANGED so you can see the event fire on
+    // every successful assignment. If `id` were missing, equals() would
+    // return true and this handler would never run.
+    chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, function (event) {
+      var oldSym = event.oldValue && event.oldValue.symbol;
+      var newSym = event.value && event.value.symbol;
+      var line = '[' + new Date().toLocaleTimeString() + '] INSTRUMENT_CHANGED: ' + oldSym + ' -> ' + newSym + ' (id=' + event.value.id + ')';
+      var log = document.getElementById('eventLog');
+      log.textContent = line + '\n' + log.textContent;
+    });
+
+    function switchTo(key) {
+      // In a production app backed by a real catalog, prefer:
+      //
+      //   var next = await FintaChart.Instrument.filterById(id);
+      //
+      // which fetches a canonical IInstrument from your backend with
+      // the `id` already populated. Here we look it up locally.
+      var next = instruments[key] && instruments[key].instrument;
+      if (!next) return;
+
+      chart.instrument = next;     // stages a new bars request
+      chart.sendBarsRequest();      // flushes it through datafeed.send()
+
+      document.getElementById('status').textContent =
+        'instrument: ' + next.symbol + ' (id=' + next.id + ')';
+    }
+
+    var buttons = document.querySelectorAll('[data-key]');
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].addEventListener('click', function () {
+        switchTo(this.getAttribute('data-key'));
+      });
+    }
+
+    document.getElementById('status').textContent =
+      'instrument: ' + instruments['EUR/GBP'].instrument.symbol +
+      ' (id=' + instruments['EUR/GBP'].instrument.id + ')';
+  </script>
+</body>
+</html>

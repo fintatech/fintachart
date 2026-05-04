@@ -320,3 +320,60 @@ const chart = new FintaChart.Chart({
   instrument: { symbol: 'AAPL', exchange: 'NASDAQ' }
 });
 ```
+
+## Switching instruments at runtime
+
+Once a chart is mounted, the host application typically needs to swap the active instrument — for example when the user picks a different symbol from a sidebar, watchlist, or search dropdown. The contract is small but has two requirements that are not enforced by the type system, so getting either one wrong produces a silent no-op rather than an error.
+
+### Requirements
+
+1. **Every `IInstrument` must have a unique `id`.** Identity throughout the chart — including `Instrument.equals(a, b)` and the `chart.instrument` setter's change detection — is keyed off `id` only. Two instruments without an `id` compare as equal (`undefined === undefined`), and the setter then skips the entire update block. See [Identity & equality](instrument.md#identity--equality) for the full rationale.
+2. **The setter stages a request; the consumer flushes it.** Assigning `chart.instrument = next` populates an internal `_newBarsRequest` and fires `INSTRUMENT_CHANGED`, but it does **not** call `datafeed.send(...)` itself. The consumer must invoke `chart.sendBarsRequest()` to flush the staged request through the datafeed.
+
+### Recommended pattern
+
+```javascript
+async function switchTo(id) {
+  // 1. Fetch a canonical instrument by id. Backed by your own catalog
+  //    in production; FintaChart.Instrument.filterById is the documented
+  //    entry point and returns an IInstrument with `id` populated.
+  const next = await FintaChart.Instrument.filterById(id);
+
+  // 2. Assign — this stages a bars request and emits INSTRUMENT_CHANGED.
+  chart.instrument = next;
+
+  // 3. Flush. Without this call the datafeed never sees the new request.
+  chart.sendBarsRequest();
+}
+```
+
+### Lifecycle
+
+```
+chart.instrument = next
+        │
+        ▼
+   Instrument.equals(old, next)
+        │
+        ├── true  ──▶  no-op (setter returns early)
+        │
+        └── false ──▶  this._instrument = next
+                       this._newBarsRequest = { kind: BARS, count: 500 }
+                       fire INSTRUMENT_CHANGED
+
+chart.sendBarsRequest()
+        │
+        ▼
+   datafeed.cancel(currentRequest)   // if any in flight
+   datafeed.send(newBarsRequest)     // chart now waits for bars
+```
+
+### Common mistakes
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| Symbol label updates but no new bars load | `sendBarsRequest()` not called after assignment | Call `chart.sendBarsRequest()` |
+| Assignment appears to do nothing; `INSTRUMENT_CHANGED` does not fire | Both old and new instrument lack `id`, so `Instrument.equals` returns `true` | Populate `id` on every instrument |
+| Stale bars from the previous instrument briefly visible | Previous request was not cancelled | Use `chart.sendBarsRequest()` instead of calling `datafeed.send()` directly — `sendBarsRequest()` cancels any in-flight request first |
+
+A complete working example is at [`examples/html/14-instrument-switching/`](../../examples/html/14-instrument-switching/).

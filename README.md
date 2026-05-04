@@ -15,8 +15,8 @@ High-performance financial charting component for web applications. Designed for
 
 ## Features
 
-- **16+ chart types** — Candlestick, OHLC, Heikin Ashi, Renko, Kagi, Line Break, Point & Figure, Hollow Candle, Range Bar, Candle Volume, Equi Volume, Mountain, Line, Area, and more
-- **100+ technical indicators** — RSI, MACD, Bollinger Bands, Ichimoku, EMA, SMA, Stochastics, and the full range of standard analysis tools
+- **19 chart types** — Candlestick, OHLC, Heikin Ashi, Renko, Kagi, Line Break, Point & Figure, Hollow Candle, Range Bar, Candle Volume, Equi Volume, Line, Area, and more
+- **114 technical indicators** — RSI, MACD, Bollinger Bands, Ichimoku, EMA, SMA, Stochastics, and the full range of standard analysis tools
 - **Drawing and analysis tools** — Lines, channels, rectangles, circles, ellipses, polygons, freehand, arrows, text and image annotations
 - **Fibonacci tools** — Retracements, Fan, Extensions, Arcs, Ellipses, Time Zones
 - **Trend analysis** — Andrews' Pitchfork, Raff Regression, Error Channel, Gann Fan, Speed Lines, Quadrant Lines, Tirone Levels
@@ -50,6 +50,8 @@ npm install @fintatech/fintachart
 <!-- 2. Framework dependencies -->
 <script src="node_modules/@fintatech/fintachart/scripts/frameworks/Intl.min.js"></script>
 <script src="node_modules/@fintatech/fintachart/scripts/frameworks/moment.min.js"></script>
+<script src="node_modules/@fintatech/fintachart/scripts/frameworks/detectizr.min.js"></script>
+<script src="node_modules/@fintatech/fintachart/scripts/frameworks/dom-to-image-more.min.js"></script>
 <script src="node_modules/@fintatech/fintachart/scripts/frameworks/i18nextXHRBackend.min.js"></script>
 
 <!-- 3. Main bundle -->

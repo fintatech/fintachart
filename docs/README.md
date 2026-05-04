@@ -16,9 +16,10 @@
 | [Instrument](api/instrument.md) | Symbol definition and static helpers |
 | [DataContext](api/data-context.md) | OHLCV data management |
 | [Panes](api/panes.md) | PanesContainer and Pane classes |
-| [Chart Types](api/chart-types.md) | 17 chart type configurations |
+| [Chart Types](api/chart-types.md) | 19 chart type configurations |
 | [Shapes](api/shapes.md) | 30+ drawing tools and shape classes |
 | [Indicators](api/indicators.md) | Indicator base class, factory, events |
+| [Custom Indicators](api/custom-indicators.md) | Build your own — lifecycle, plots, parameters, registration |
 | [Indicator Parameters](api/indicator-params.md) | Per-indicator parameter reference (114 indicators) |
 | [DataRows](api/data-rows.md) | Data storage and manipulation |
 | [Scales](api/scales.md) | Vertical and horizontal scale configuration |

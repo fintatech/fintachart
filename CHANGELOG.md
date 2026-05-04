@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.2] - 2026-05-04
+
+### Added
+
+- `FintaChart.Themes` — public namespace exposing the 10 built-in themes (`defaultTheme`, `darkTheme`, `fintatechDarkTheme`, `beetTheme`, `grayTheme`, `oliveTheme`, `orangeTheme`, `purpleTheme`, `skyTheme`, `tealTheme`).
+- `FintaChart.ThemeUtils.deepMerge(target, source)` for deriving custom themes from a base theme.
+- `ChartTypeNames.LINE` (`'line'`) and `ChartTypeNames.AREA` (`'area'`) — the two chart types that were registered with `ChartTypeFactory` but missing from the public `ChartTypeNames` constant.
+- New example `examples/html/14-instrument-switching/` demonstrating the programmatic instrument-change pattern with `INSTRUMENT_CHANGED` event handling.
+- New custom-indicators guide at `docs/api/custom-indicators.md` covering lifecycle hooks, plot setup, parameters, the two registration patterns (direct add vs `IndicatorFactory.add` for state save/restore), and reserved-field pitfalls.
+- New "Identity & equality" section in `docs/api/instrument.md` documenting the `id`-based equality contract and the silent no-op trap when instruments lack `id`.
+- New "Switching instruments at runtime" section in `docs/api/data-adapters.md` documenting the unique-`id` + explicit `sendBarsRequest()` contract.
+- `id` field populated on the bundled `FileDatafeed` instrument configs (`shared/file-data-adapter.js`, `src/scripts/jsdataadapters/fileDataAdapter.js`).
+
+### Changed
+
+- `chart.appendBars(bars)` now auto-establishes the visible range and calls `refreshAsync(true)` when called on a chart with no visible range set.
+- Renamed example `examples/html/14-custom-datafeed/` to `examples/html/15-custom-datafeed/` to make room for the new instrument-switching example.
+
+### Fixed
+
+- Toolbar / instrument watermark duplication on chart re-create, and scrollbar theme sync when the active theme changes.
+- README quick-start now lists `detectizr.min.js` and `dom-to-image-more.min.js` in the framework script block — both have always been runtime-required and were previously missing from the documented script list, causing `FintaChart.Chart is not a constructor` for anyone copy-pasting the README quick-start.
+- `docs/quick-start/chart-concepts.md` quickstart switched from `chart.chartType = 'candle'` (assignment to the chart-type-instance accessor; throws on string) to `chart.applyChartType('candle')` (the public method that takes a string).
+- Documentation counts unified at **19 chart types** and **114 indicators** across README, introduction, chart-concepts, chart-types, indicators, and custom-indicators (was variously 16+/17 and 95/100+ depending on the doc).
+- `docs/api/events-enums.md` `ChartTypeNames` table rebuilt against the source constant — previously listed fabricated entries (`BAR`, `MOUNTAIN`, `STEP_LINE`, `DOT`, `DASH`, `VOLUME_CANDLE`, etc.) that don't exist; now lists all 19 real entries.
+- `docs/api/indicators.md` "Available Indicator Types" section: removed the unregistered `Encapsulation`, added the missing `EaseOfMovement` and `WWS`. Listed types now match the 114 registered with `IndicatorFactory`.
+
 ## [3.1.1] - 2026-04-22
 
 ### Changed
@@ -23,5 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.2]: https://github.com/fintatech/fintachart/releases/tag/v3.1.2
 [3.1.1]: https://github.com/fintatech/fintachart/releases/tag/v3.1.1
 [3.1.0]: https://github.com/fintatech/fintachart/releases/tag/v3.1.0

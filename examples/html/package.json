@@ -1,11 +1,11 @@
 {
-  "name": "fintachart-examples",
-  "private": true,
-  "description": "Standalone examples for @fintatech/fintachart",
-  "scripts": {
-    "serve": "npx serve ."
-  },
-  "dependencies": {
-    "@fintatech/fintachart": "3.1.1"
-  }
+    "name": "fintachart-examples",
+    "private": true,
+    "description": "Standalone examples for @fintatech/fintachart",
+    "scripts": {
+        "serve": "npx serve ."
+    },
+    "dependencies": {
+        "@fintatech/fintachart": "3.1.2"
+    }
 }

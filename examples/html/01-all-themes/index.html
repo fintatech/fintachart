@@ -58,42 +58,62 @@
     var datafeed = fileDatafeed;
     var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
 
-    // Custom theme: deep-clone darkTheme, override key colors to Blue/Gold
-    var customTheme = JSON.parse(JSON.stringify(darkTheme));
-    customTheme.name = 'CustomBlueGold';
-    customTheme.chart.background = ['#0a1628', '#0a1628'];
-    customTheme.chart.border.strokeColor = '#1a2744';
-    customTheme.pane.grid.strokeColor = 'rgba(255, 255, 255, 0.05)';
-    customTheme.verticalScale.fill.fillColor = '#0d1b30';
-    customTheme.verticalScale.text.fillColor = '#8899bb';
-    customTheme.verticalScale.line.strokeColor = '#1a2744';
-    customTheme.horizontalScale.fill.fillColor = '#0d1b30';
-    customTheme.horizontalScale.text.fillColor = '#8899bb';
-    customTheme.horizontalScale.line.strokeColor = '#1a2744';
-    customTheme.crossHair.line.strokeColor = '#ffc107';
-    customTheme.crossHair.text.fillColor = '#000';
-    customTheme.crossHair.fill.fillColor = '#ffc107';
-    // Candle colors: gold up, blue down
-    var up = customTheme.plot.bar.candle.upCandle;
-    up.border.strokeColor = '#ffc107';
-    up.fill.fillColor = '#ffc107';
-    up.shadow.strokeColor = '#ffc107';
-    var down = customTheme.plot.bar.candle.downCandle;
-    down.border.strokeColor = '#3d7aed';
-    down.fill.fillColor = '#3d7aed';
-    down.shadow.strokeColor = '#3d7aed';
+    // Custom theme: build via FintaChart.ThemeUtils.deepMerge from FintaChart.Themes.dark.
+    // deepMerge clones the source — Themes.dark stays untouched (verified via "Verify APIs" button).
+    var customTheme = FintaChart.ThemeUtils.deepMerge(FintaChart.Themes.dark, {
+      name: 'CustomBlueGold',
+      chart: {
+        background: ['#0a1628', '#0a1628'],
+        border: { strokeColor: '#1a2744' },
+      },
+      pane: { grid: { strokeColor: 'rgba(255, 255, 255, 0.05)' } },
+      verticalScale: {
+        fill: { fillColor: '#0d1b30' },
+        text: { fillColor: '#8899bb' },
+        line: { strokeColor: '#1a2744' },
+      },
+      horizontalScale: {
+        fill: { fillColor: '#0d1b30' },
+        text: { fillColor: '#8899bb' },
+        line: { strokeColor: '#1a2744' },
+      },
+      crossHair: {
+        line: { strokeColor: '#ffc107' },
+        text: { fillColor: '#000' },
+        fill: { fillColor: '#ffc107' },
+      },
+      plot: {
+        bar: {
+          candle: {
+            // Gold up, blue down
+            upCandle: {
+              border: { strokeColor: '#ffc107' },
+              fill: { fillColor: '#ffc107' },
+              shadow: { strokeColor: '#ffc107' },
+            },
+            downCandle: {
+              border: { strokeColor: '#3d7aed' },
+              fill: { fillColor: '#3d7aed' },
+              shadow: { strokeColor: '#3d7aed' },
+            },
+          },
+        },
+      },
+    });
 
+    // Read built-ins through FintaChart.Themes.
+    var T = FintaChart.Themes;
     var themeMap = {
-      defaultTheme: defaultTheme,
-      darkTheme: darkTheme,
-      fintatechDarkTheme: fintatechDarkTheme,
-      beetTheme: beetTheme,
-      grayTheme: grayTheme,
-      oliveTheme: oliveTheme,
-      orangeTheme: orangeTheme,
-      purpleTheme: purpleTheme,
-      skyTheme: skyTheme,
-      tealTheme: tealTheme,
+      defaultTheme: T.default,
+      darkTheme: T.dark,
+      fintatechDarkTheme: T.fintatechDark,
+      beetTheme: T.beet,
+      grayTheme: T.gray,
+      oliveTheme: T.olive,
+      orangeTheme: T.orange,
+      purpleTheme: T.purple,
+      skyTheme: T.sky,
+      tealTheme: T.teal,
       customTheme: customTheme,
     };
 
