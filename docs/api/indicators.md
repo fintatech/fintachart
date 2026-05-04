@@ -2,6 +2,8 @@
 
 `Indicator` (extending `AbstractIndicator`) is the base class for all technical analysis indicators. Indicators are created via `IndicatorFactory`, configured through parameters, and rendered on chart panes.
 
+> **Building your own indicator?** See the [custom indicators guide](custom-indicators.md) for the full lifecycle, plot setup, parameters, and the two registration patterns (`chart.addIndicators(new MyIndicator())` vs `IndicatorFactory.add(MyIndicator)` + `chart.addIndicators({ type: 'MyIndicator' })` for state save/restore).
+
 ## Indicator (AbstractIndicator base class)
 
 ### Accessors
@@ -190,11 +192,11 @@ String constants used with `EventEmitter.on()` / `EventEmitter.off()` to subscri
 
 ## Available Indicator Types
 
-The library ships with 95 built-in indicator types. Use the type name string with `IndicatorFactory.create()`.
+The library ships with 114 built-in indicator types. Use the type name string with `IndicatorFactory.create()`.
 
 ### Trend & Moving Averages
 
-`DEMA`, `EMA`, `HMA`, `KAMA`, `LinearRegression`, `LinearRegressionForecast`, `LinearRegressionIntercept`, `LinearRegressionSlope`, `McGinleysDynamic`, `SMA`, `TEMA`, `TMA`, `Trend`, `TSF`, `VIDYA`, `VMA`, `VOLMA`, `WMA`, `ZLEMA`
+`DEMA`, `EMA`, `HMA`, `KAMA`, `LinearRegression`, `LinearRegressionForecast`, `LinearRegressionIntercept`, `LinearRegressionSlope`, `McGinleysDynamic`, `SMA`, `TEMA`, `TMA`, `Trend`, `TSF`, `VIDYA`, `VMA`, `VOLMA`, `WMA`, `WWS`, `ZLEMA`
 
 ### Oscillators
 
@@ -206,11 +208,11 @@ The library ships with 95 built-in indicator types. Use the type name string wit
 
 ### Volume
 
-`ADL`, `ChaikinMoneyFlow`, `ChaikinOscillator`, `EFI`, `EFT`, `MarketFacilitationIndex`, `MFI`, `NVI`, `OBV`, `PVI`, `PVT`, `TMF`, `TVI`, `VOLUME`, `VolumeUpDown`, `VROC`, `VWAP`, `WAD`
+`ADL`, `ChaikinMoneyFlow`, `ChaikinOscillator`, `EaseOfMovement`, `EFI`, `EFT`, `MarketFacilitationIndex`, `MFI`, `NVI`, `OBV`, `PVI`, `PVT`, `TMF`, `TVI`, `VOLUME`, `VolumeUpDown`, `VROC`, `VWAP`, `WAD`
 
 ### Price & Statistical
 
-`CenterOfGravity`, `CRS`, `DBox`, `DeviationToMA`, `ElderRay`, `ElderThermometer`, `Encapsulation`, `GRI`, `HML`, `MedianPrice`, `PerformanceIndex`, `SUM`, `TypicalPrice`, `WeightedClose`
+`CenterOfGravity`, `CRS`, `DBox`, `DeviationToMA`, `ElderRay`, `ElderThermometer`, `GRI`, `HML`, `MedianPrice`, `PerformanceIndex`, `SUM`, `TypicalPrice`, `WeightedClose`
 
 ### Pattern & Special
 

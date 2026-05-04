@@ -60,6 +60,8 @@ Use these constants with `chart.applyChartType()` to switch between chart types.
 | `ChartTypeNames.CANDLE_VOLUME` | `'candleVolume'` | Volume |
 | `ChartTypeNames.EQUI_VOLUME` | `'equiVolume'` | Volume |
 | `ChartTypeNames.EQUI_VOLUME_SHADOW` | `'equiVolumeShadow'` | Volume |
+| `ChartTypeNames.LINE` | `'line'` | Line |
+| `ChartTypeNames.AREA` | `'area'` | Line |
 
 ### Usage
 

@@ -2,7 +2,7 @@
 
 ### HTML
 
-14 standalone HTML examples in [`html/`](html/):
+15 standalone HTML examples in [`html/`](html/):
 
 | # | Example | What it demonstrates |
 |---|---------|---------------------|
@@ -19,7 +19,8 @@
 | 11 | [Timeframes](html/11-timeframes/) | Timeframe switching (1m to 1M) |
 | 12 | [Localization](html/12-localization/) | English / Ukrainian language toggle |
 | 13 | [Programmatic API](html/13-programmatic-api/) | Scroll, zoom, export CSV, save image, toggle grid |
-| 14 | [Custom Datafeed](html/14-custom-datafeed/) | Simulated REST + L1 ticks with instrument search |
+| 14 | [Instrument Switching](html/14-instrument-switching/) | Programmatic instrument changes — `id` + `sendBarsRequest()` pattern |
+| 15 | [Custom Datafeed](html/15-custom-datafeed/) | Simulated REST + L1 ticks with instrument search |
 
 ### React + TypeScript
 

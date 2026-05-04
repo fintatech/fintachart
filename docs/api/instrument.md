@@ -22,6 +22,33 @@ The `IInstrument` interface describes a tradeable symbol and its properties. The
 | `currency` | `string` *(optional)* | Quote currency code (e.g. `'GBP'`) |
 | `kind` | `string` *(optional)* | Additional instrument classification |
 
+## Identity & equality
+
+Every `IInstrument` is identified by its `id` field. `id` is the **canonical identity** used throughout the chart: equality checks, datafeed lookups, state save/restore, and the runtime-instrument setter all key off this value.
+
+**`Instrument.equals(a, b)` compares `id` only.** It does *not* look at `symbol`, `exchange`, or any other field. As a consequence, two instruments constructed without an `id` (i.e. both `id === undefined`) compare as equal — the test reduces to `undefined === undefined`.
+
+**Implication for `chart.instrument =` assignment.** The setter short-circuits when `Instrument.equals(old, new)` is `true`, so assigning a new instrument that lacks an `id` (or shares the same `id` as the current one) is a silent no-op: the chart does not update, no `INSTRUMENT_CHANGED` event fires, and no bars request is staged.
+
+**Recommended pattern.**
+
+1. Populate `id` on every instrument you construct or load. Symbol-based ids (e.g. `'eur-gbp'`) are fine; the only requirement is uniqueness within your dataset.
+2. Prefer [`Instrument.filterById(id)`](#filterbyid) for lookups — it returns a canonical instance with the `id` already populated.
+3. After assigning `chart.instrument = next`, call `chart.sendBarsRequest()` to flush the staged bars request. See *Switching instruments at runtime* in [data-adapters.md](data-adapters.md#switching-instruments-at-runtime) for the full lifecycle.
+
+```javascript
+// Good — explicit id, canonical lookup, explicit flush
+const next = await FintaChart.Instrument.filterById('eur-cad');
+chart.instrument = next;
+chart.sendBarsRequest();
+
+// Bad — both instruments lack an id, equals() returns true,
+// assignment is a silent no-op
+chart.instrument = { symbol: 'EUR/CAD', exchange: 'FOREX', tickSize: 0.00001 };
+```
+
+A working end-to-end example is at [`examples/html/14-instrument-switching/`](../../examples/html/14-instrument-switching/).
+
 ## Static Methods
 
 #### all

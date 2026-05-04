@@ -80,10 +80,10 @@ Supported periodicity values:
 
 ## Chart Types
 
-FintaChart supports 17 chart types. Set the type through the `chartType` property:
+FintaChart supports 19 chart types. Set the type by calling `applyChartType()` with the type name:
 
 ```javascript
-chart.chartType = 'candle';
+chart.applyChartType('candle');
 ```
 
 | Chart Type | Key |
@@ -105,10 +105,12 @@ chart.chartType = 'candle';
 | Candle Volume | `candleVolume` |
 | Equi Volume | `equiVolume` |
 | Equi Volume Shadow | `equiVolumeShadow` |
+| Line | `line` |
+| Area | `area` |
 
 ## Indicators
 
-Indicators are added through the `IndicatorFactory`. FintaChart ships with 95 built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
+Indicators are added through the `IndicatorFactory`. FintaChart ships with 114 built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
 
 ```javascript
 // Add a 20-period simple moving average to the price pane
