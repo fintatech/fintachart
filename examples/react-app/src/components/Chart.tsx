@@ -22,6 +22,9 @@ export function Chart({ instrument }: ChartProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Clear container to prevent double-rendering in StrictMode
+    containerRef.current.innerHTML = '';
+
     // Static paths for SVG icons / localization / html dialogs.
     FintaChart.ResourcePath.localization = 'node_modules/@fintatech/fintachart/localization/';
     FintaChart.ResourcePath.htmlDialogs = 'node_modules/@fintatech/fintachart/htmldialogs/';

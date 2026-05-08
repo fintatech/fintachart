@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrument Search Modal — FintaChart</title>
+
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body>
+
+  <div class="example-header">
+    <h1>Instrument Search Modal</h1>
+    <p>
+      Wire your catalog into the chart's built-in search modal. Click the symbol button on the
+      toolbar (top-left) to open it — type to filter by symbol or company, click an exchange tab
+      to narrow the list. Three hooks do all the work:
+      <code>FintaChart.Instrument.filter</code>, <code>FintaChart.Instrument.filterById</code>,
+      and <code>chart.exchanges()</code>.
+    </p>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <script src="../shared/includes.js"></script>
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <script src="../shared/chart-config.js"></script>
+  <script>
+    'use strict';
+
+    // =======================================================================
+    // 1. Instrument catalog
+    //
+    // In production this would live on your backend. Each entry MUST have a
+    // unique `id` — the chart keys identity off it (see docs/api/instrument.md
+    // "Identity & equality"). Without `id`, instrument switching from the
+    // search modal becomes a silent no-op.
+    // =======================================================================
+
+    var instruments = [
+      { id: '1', symbol: 'EUR/USD', exchange: 'FOREX',  type: 'FOREX',  company: 'Euro / US Dollar',           tickSize: 0.00001, seedPrice: 1.0850   },
+      { id: '2', symbol: 'GBP/USD', exchange: 'FOREX',  type: 'FOREX',  company: 'British Pound / US Dollar',  tickSize: 0.00001, seedPrice: 1.2650   },
+      { id: '3', symbol: 'USD/JPY', exchange: 'FOREX',  type: 'FOREX',  company: 'US Dollar / Japanese Yen',   tickSize: 0.001,   seedPrice: 155.50   },
+      { id: '4', symbol: 'EUR/GBP', exchange: 'FOREX',  type: 'FOREX',  company: 'Euro / British Pound',       tickSize: 0.00001, seedPrice: 0.8580   },
+      { id: '5', symbol: 'AAPL',    exchange: 'NASDAQ', type: 'Stock',  company: 'Apple Inc.',                 tickSize: 0.01,    seedPrice: 195.00   },
+      { id: '6', symbol: 'MSFT',    exchange: 'NASDAQ', type: 'Stock',  company: 'Microsoft Corp.',            tickSize: 0.01,    seedPrice: 420.00   },
+      { id: '7', symbol: 'TSLA',    exchange: 'NASDAQ', type: 'Stock',  company: 'Tesla, Inc.',                tickSize: 0.01,    seedPrice: 245.00   },
+      { id: '8', symbol: 'BTC/USD', exchange: 'CRYPTO', type: 'Crypto', company: 'Bitcoin / US Dollar',        tickSize: 0.01,    seedPrice: 67500.00 },
+      { id: '9', symbol: 'ETH/USD', exchange: 'CRYPTO', type: 'CRYPTO', company: 'Ethereum / US Dollar',       tickSize: 0.01,    seedPrice: 3400.00  },
+    ];
+
+    // =======================================================================
+    // 2. Minimal datafeed — generates random OHLCV history on demand.
+    //    The example focuses on the search modal, not on data; we just need
+    //    *something* to draw when the user picks an instrument.
+    // =======================================================================
+
+    function fetchHistory(symbol, periodicity, interval, count) {
+      var seed = (instruments.filter(function (i) { return i.symbol === symbol; })[0] || instruments[0]).seedPrice;
+      var volatility = seed * 0.001;
+      var barMs = interval * ({ '': 60000, 'h': 3600000, 'd': 86400000 }[periodicity] || 60000);
+      var now = Date.now();
+      var start = now - count * barMs;
+      var bars = [];
+      var price = seed;
+
+      for (var i = 0; i < count; i++) {
+        var open = price;
+        var c1 = (Math.random() - 0.48) * volatility;
+        var c2 = (Math.random() - 0.48) * volatility;
+        var close = open + c1;
+        var high = Math.max(open, close) + Math.abs(c2);
+        var low = Math.min(open, close) - Math.abs(c2) * 0.8;
+        bars.push({
+          date: new Date(start + i * barMs),
+          open: open, high: high, low: low, close: close,
+          volume: Math.floor(Math.random() * 200) + 50,
+        });
+        price = close;
+      }
+      return Promise.resolve(bars);
+    }
+
+    class SearchDatafeed extends FintaChart.DatafeedBase {
+      send(request) {
+        super.send(request);
+        var self = this;
+        var inst = request.instrument || request.chart.instrument;
+        var tf = request.chart.timeFrame;
+        fetchHistory(inst.symbol, tf.periodicity, tf.interval, request.count || 500)
+          .then(function (bars) {
+            if (!self.isBusy(request)) return;
+            self.onCompleteRequest(request, bars);
+          });
+      }
+    }
+
+    // =======================================================================
+    // 3. Chart init
+    // =======================================================================
+
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: new SearchDatafeed(),
+      instrument: instruments[0],
+      timeFrame: { interval: 1, periodicity: '' },
+      theme: defaultTheme,
+      showToolbar: true,        // toolbar exposes the search button
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes'],
+    });
+
+    // =======================================================================
+    // 4. Search modal hooks — the three integration points
+    // =======================================================================
+
+    // 4a. Instrument.filter — called by the search modal every keystroke and
+    //     every time the user clicks an exchange tab. Receives the user's
+    //     query, the active exchange filters (array of exchange codes), and
+    //     pagination hints (page is 1-based, size is the page size). Return a
+    //     Promise<IInstrument[]> — only the rows for the requested page.
+    //
+    //     Filter rules:
+    //       - empty query → return everything (matchesQuery is true)
+    //       - query → match on symbol OR company, case-insensitive
+    //       - empty filters → no exchange restriction
+    //       - non-empty filters → instrument.exchange must be in the list
+    FintaChart.Instrument.filter = function (symbol, filters, page, size) {
+      var q = (symbol || '').toLowerCase();
+      var results = instruments.filter(function (inst) {
+        var matchesQuery = !q ||
+          inst.symbol.toLowerCase().indexOf(q) >= 0 ||
+          inst.company.toLowerCase().indexOf(q) >= 0;
+        var matchesExchange = !filters || !filters.length ||
+          filters.indexOf(inst.exchange) >= 0;
+        return matchesQuery && matchesExchange;
+      });
+
+      // Honour the modal's pagination. The chart calls with page = 1 for the
+      // first page, so subtract 1 before slicing. Skip when args are missing
+      // (callers that don't paginate get the full set).
+      if (typeof page === 'number' && typeof size === 'number') {
+        var startPage = Math.max(0, page - 1);
+        results = results.slice(startPage * size, startPage * size + size);
+      }
+      return Promise.resolve(results);
+    };
+
+    // 4b. Instrument.filterById — called when the modal needs the canonical
+    //     IInstrument for an id (e.g. when a result is clicked, or when the
+    //     chart restores from saved state). Always resolve to a fully-populated
+    //     instrument, never null.
+    FintaChart.Instrument.filterById = function (id) {
+      var inst = instruments.filter(function (i) { return i.id === id; })[0];
+      return Promise.resolve(inst || instruments[0]);
+    };
+
+    // 4c. chart.exchanges — drives the filter tabs at the top of the modal.
+    //     Return a static list, or compute it from your catalog. The tabs
+    //     appear in the order returned here.
+    chart.exchanges = function () {
+      return ['FOREX', 'NASDAQ', 'CRYPTO'];
+    };
+
+  </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 
 ### HTML
 
-15 standalone HTML examples in [`html/`](html/):
+16 standalone HTML examples in [`html/`](html/):
 
 | # | Example | What it demonstrates |
 |---|---------|---------------------|
@@ -20,7 +20,8 @@
 | 12 | [Localization](html/12-localization/) | English / Ukrainian language toggle |
 | 13 | [Programmatic API](html/13-programmatic-api/) | Scroll, zoom, export CSV, save image, toggle grid |
 | 14 | [Instrument Switching](html/14-instrument-switching/) | Programmatic instrument changes — `id` + `sendBarsRequest()` pattern |
-| 15 | [Custom Datafeed](html/15-custom-datafeed/) | Simulated REST + L1 ticks with instrument search |
+| 15 | [Instrument Search Modal](html/15-instrument-search/) | Wire your catalog into the toolbar's search modal — `Instrument.filter`, `filterById`, `chart.exchanges()` |
+| 16 | [Custom Datafeed](html/16-custom-datafeed/) | Simulated REST + L1 ticks with instrument search |
 
 ### React + TypeScript
 
