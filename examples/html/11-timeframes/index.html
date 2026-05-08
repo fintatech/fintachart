@@ -33,7 +33,6 @@
     <button class="tf-btn" data-interval="4" data-periodicity="HOUR">4H</button>
     <button class="tf-btn" data-interval="1" data-periodicity="DAY">1D</button>
     <button class="tf-btn" data-interval="1" data-periodicity="WEEK">1W</button>
-    <button class="tf-btn" data-interval="1" data-periodicity="MONTH">1M</button>
     <div class="separator"></div>
     <label>Current: <strong id="currentTF">1H</strong></label>
   </div>
@@ -64,7 +63,6 @@
     periodicityLabels[FintaChart.Periodicity.HOUR] = 'H';
     periodicityLabels[FintaChart.Periodicity.DAY] = 'D';
     periodicityLabels[FintaChart.Periodicity.WEEK] = 'W';
-    periodicityLabels[FintaChart.Periodicity.MONTH] = 'M';
 
     function formatTimeFrame(tf) {
       return tf.interval + (periodicityLabels[tf.periodicity] || tf.periodicity);
@@ -84,7 +82,7 @@
       theme: defaultTheme,
       showToolbar: false,
       showScrollbar: true,
-      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month'],
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week'],
     });
 
     // --- Controls ---
