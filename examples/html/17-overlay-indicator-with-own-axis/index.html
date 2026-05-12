@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Indicator with Own Axis — FintaChart</title>
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/spectrum.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/toastr.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/external/jqNumericField.min.css">
+  <link rel="stylesheet" href="../node_modules/@fintatech/fintachart/css/FintaChart.min.css">
+  <link rel="stylesheet" href="../shared/example-base.css">
+</head>
+<body>
+
+  <div class="example-header">
+    <h1>Overlay Indicator with Own Axis</h1>
+    <p>Plot a derived series (cycle composite) over price, time-aligned but auto-scaled to its own y-axis on the left.</p>
+  </div>
+
+  <div id="chartContainer"></div>
+
+  <!-- 1. Framework + chart library -->
+  <script src="../shared/includes.js"></script>
+  <!-- 2. Theme -->
+  <script src="../node_modules/@fintatech/fintachart/scripts/themes/defaultTheme.js"></script>
+  <!-- 3. Datafeed -->
+  <script src="../shared/file-data-adapter.js"></script>
+  <!-- 4. Resource paths -->
+  <script src="../shared/chart-config.js"></script>
+
+  <script>
+    'use strict';
+
+    // =========================================================================
+    // CycleComposite -- normalized overlay indicator (range ~ [-100, +100])
+    //
+    // A multi-frequency sine composite that mimics the output of a cycle
+    // scanner: a normalized-range signal that must stay time-aligned with
+    // price but cannot share price's y-axis (its value range is unrelated).
+    //
+    // The indicator:
+    //   - isOverlay = true              -- lives on the primary (price) pane
+    //   - bindToVerticalScale(scale)    -- routes its plot to a custom y-axis
+    //
+    // Result: scroll/zoom keeps the composite locked to price by time, while
+    // the composite auto-scales against its own left-side axis labelled with
+    // composite values (not price).
+    // =========================================================================
+    function CycleComposite() {
+      FintaChart.Indicator.apply(this, arguments);
+    }
+
+    CycleComposite.prototype = Object.create(FintaChart.Indicator.prototype);
+    CycleComposite.prototype.constructor = CycleComposite;
+
+    Object.defineProperty(CycleComposite, 'type', {
+      get: function () { return 'CycleComposite'; }
+    });
+
+    CycleComposite.prototype.onResetDefaults = function () {
+      this.name = 'Cycle Composite';
+      this.isOverlay = true;          // share the primary pane with price
+
+      // Three reference cycles (bars): short / medium / long.
+      // Amplitudes chosen so the sum sits in roughly [-100, +100].
+      this.addPlot('#a855f7', 'Composite', null, 2);
+      this.addPlot('#94a3b8', 'Zero',      null, 1, FintaChart.LineStyle.DASH);
+    };
+
+    CycleComposite.prototype.onInitializeIndicator = function () {
+      // No state needed — composite is a pure function of bar index.
+    };
+
+    CycleComposite.prototype.onInputTick = function () {
+      var bar = this.currentBar;
+
+      var fast = Math.sin(bar * 2 * Math.PI / 8)  * 50;
+      var med  = Math.sin(bar * 2 * Math.PI / 21) * 30;
+      var slow = Math.sin(bar * 2 * Math.PI / 55) * 20;
+
+      this.values.get('Composite').set(fast + med + slow);
+      this.values.get('Zero').set(0);
+    };
+
+    FintaChart.IndicatorFactory.add(CycleComposite);
+
+    // =========================================================================
+    // Chart initialisation
+    // =========================================================================
+
+    var datafeed   = fileDatafeed;
+    var instrument = fileDatafeedConfig.instruments['EUR/GBP'].instrument;
+
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: datafeed,
+      instrument: instrument,
+      timeFrame: { interval: 1, periodicity: FintaChart.Periodicity.HOUR },
+      theme: defaultTheme,
+      showToolbar: false,
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes', '1 Hour', '4 Hours', '1 Day', '1 Week', '1 Month', '1 Year'],
+    });
+
+    // -------------------------------------------------------------------------
+    // The integration recipe -- four lines.
+    //
+    // 1. Create a new vertical scale on the chart. By default it lives on the
+    //    right side; flip it to the left so it doesn't fight price's axis.
+    // 2. Construct the custom indicator instance.
+    // 3. Bind the indicator to the new scale BEFORE adding it -- the binding is
+    //    propagated to the indicator's plots during the first refresh.
+    // 4. Add the indicator. Because isOverlay = true it joins the primary pane;
+    //    because verticalScale is set, its plot uses the custom coordinate
+    //    mapper (Pane.getCoordinateMapper(scale)) rather than price's.
+    // -------------------------------------------------------------------------
+    var compositeScale = chart.addVerticalScale();
+    compositeScale.leftAxisVisible  = true;     // labels on the LEFT
+    compositeScale.rightAxisVisible = false;    // not on the right
+
+    var composite = new CycleComposite();
+    composite.bindToVerticalScale(compositeScale);
+    chart.addIndicators(composite);
+  </script>
+</body>
+</html>
