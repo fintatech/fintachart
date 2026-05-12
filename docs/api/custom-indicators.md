@@ -348,7 +348,16 @@ If you want explicit control, drop down a level:
 chart.primaryPane.addIndicator(new MyIndicator());     // force onto price pane
 const pane = chart.addPane();                          // create a new pane…
 pane.addIndicator(new MyOscillator());                 // …and put it there
+
+// Convenience equivalent of the second form:
+chart.addIndicatorInNewPane(new MyOscillator());
 ```
+
+`Pane.addIndicator(...)` pins the indicator's pane before the add
+lifecycle runs, so the explicit choice wins over the indicator's
+own `isOverlay` declaration. That makes it the right hook for
+runtime placement toggles — flipping a single indicator between
+"overlay" and "own pane" without needing two subclasses.
 
 ## Pitfalls
 

@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.5] - 2026-05-12
+
+- Resolved `TypeError: Cannot read properties of null (reading 'appendChild')` when opening settings dialog for custom indicators by ensuring dialog panes are initialized before appending controls.
+- Improved `ColorPicker` initialization to wait for DOM attachment using `MutationObserver`, preventing crashes in delayed rendering scenarios.
+- Scoped bundled CSS selectors for `[type="checkbox"]` to prevent aggressive styling of elements outside the chart container.
+- Fullscreen mode support via the toolbar.
+- `Indicator.isOverlay` property is now immutable after construction to ensure pane/scale stability.
+
+### Added
+
+- `Indicator.bindToVerticalScale(verticalScale)` — public helper for overlay indicators to render on the price pane against their own y-axis (cycle composites, oscillators, ML signals).
+- New example `examples/html/17-overlay-indicator-with-own-axis/` showing the integration recipe on a normalized cycle composite overlaid on price.
+
+### Changed
+
+- `Indicator.dispose()` now removes a custom `verticalScale` and triggers a chart relayout when `_isCustomScale` is set, not just for built-in Volume.
+- `Indicator.unmerge()` now strips a custom `verticalScale` when moving an overlay indicator into its own pane via the context menu, and reassigns plots to the default scale.
+
+### Fixed
+
+- `VerticalAxis.layoutContentFrames()` left-side branch is now symmetric with the right side, so two or more left axes render side-by-side instead of stacking at canvas-x=0.
+
 ## [3.1.4] - 2026-05-08
 
 ### Added
@@ -72,6 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.5]: https://github.com/fintatech/fintachart/releases/tag/v3.1.5
 [3.1.4]: https://github.com/fintatech/fintachart/releases/tag/v3.1.4
 [3.1.3]: https://github.com/fintatech/fintachart/releases/tag/v3.1.3
 [3.1.2]: https://github.com/fintatech/fintachart/releases/tag/v3.1.2
