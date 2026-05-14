@@ -71,8 +71,13 @@ Events fired by the `Chart` instance. Subscribe via `chart.on(ChartEvent.XXX, ha
 **Example**
 
 ```javascript
-chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, (event) => {
-  console.log('New instrument:', event.value.symbol);
+// Prefer reading chart.instrument directly: the setter writes _instrument
+// before firing the event, and the event's `value` field is optional
+// (its payload shape has drifted between versions — see event-emitter.md).
+chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, () => {
+  const inst = chart.instrument;
+  if (!inst?.id) return;
+  console.log('New instrument:', inst.symbol);
 });
 
 chart.on(FintaChart.ChartEvent.BARS_APPENDED, (event) => {

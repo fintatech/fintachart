@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.7] - 2026-05-14
+
+### Added
+
+- Right-click context-menu item **"Move to price pane"** for indicators (`moveToPrice`). One-click promotion of a custom-pane indicator onto the primary pane as an overlay — creates a dedicated `VerticalScale` with `leftAxisVisible = true` so the indicator's axis labels are drawn, migrates plots, rebuilds the title bar, and removes the source pane when it becomes empty. Reverse direction reuses the existing **"Separate pane bottom"** (`unmergeDown`), which already detaches a primary-pane overlay back into its own pane and disposes the custom scale. Closes the long-standing gap that forced consumers to ship their own "own pane ↔ price overlay" UI toggle (`Indicator`, `IndicatorContextMenu`, `IndicatorContextMenu.html`, en/uk localizations).
+- `docs/api/data-adapters.md`: new "Search modal: install hooks before chart construction" section documenting the `InstrumentSearch` constructor-timing race — installing `Instrument.filter`/`filterById` after `new FintaChart.Chart(...)` may produce a no-op modal.
+
+### Changed
+
+- `docs/api/instrument.md`: `Instrument.filter` first parameter renamed `symbol` → `query`; description now states the toolbar modal matches against both `instrument.symbol` and `instrument.company`.
+- `examples/html/15-instrument-search/`: restructured so `Instrument.filter` and `Instrument.filterById` are installed before chart construction (matching the documented safe pattern). `chart.exchanges` stays after the constructor (per-instance).
+
+### Fixed
+
+- Toolbar search modal now matches the query against both `instrument.symbol` and `instrument.company`. Previously only `symbol` was checked, so backends returning instruments by company name (e.g. typing "Apple" → `AAPL`, `0R2V`, `603020`) silently rendered zero results (`InstrumentSearch`).
+- Text overlap in the instrument search modal; the search window has been widened to prevent clipping.
+- `TypeError: Cannot read properties of null (reading 'appendChild')` when adding an indicator to a freshly-created pane via `Chart.addIndicatorInNewPane(...)` or `Pane.addIndicator(...)`. `Indicator.placeOnPane` now drives `chart.InitializeVisualDimensions()` and `pane.refreshScaleAsync()` on the new pane, mirroring the standard `Indicator.addPane()` bring-up, so the pane's title container is materialized before `initPaneTitle()` runs.
+
 ## [3.1.6] - 2026-05-13
 
 ### Fixed
@@ -99,6 +117,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.7]: https://github.com/fintatech/fintachart/releases/tag/v3.1.7
 [3.1.6]: https://github.com/fintatech/fintachart/releases/tag/v3.1.6
 [3.1.5]: https://github.com/fintatech/fintachart/releases/tag/v3.1.5
 [3.1.4]: https://github.com/fintatech/fintachart/releases/tag/v3.1.4

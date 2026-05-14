@@ -23,6 +23,15 @@ Extends `IEvent` with before/after values.
 | `oldValue` | `T` *(optional)* | Previous value before the change |
 | `value` | `T` *(optional)* | New value after the change |
 
+> **Note.** Both `value` and `oldValue` are optional — payload shape can drift between
+> versions, and a 3.1.4 regression was caused by handlers that treated `event.value` as
+> required. For change events that mirror a chart property (`INSTRUMENT_CHANGED`,
+> `TIME_FRAME_CHANGED`, etc.), prefer reading the chart's own getter inside the
+> handler (e.g. `chart.instrument`, `chart.timeFrame`). The setter writes
+> `this._instrument = next` *before* firing the event, so the getter is already
+> up to date when your callback runs. See the lifecycle diagram in
+> [data-adapters.md → Switching instruments at runtime](data-adapters.md#switching-instruments-at-runtime).
+
 ### IEventHandler
 
 ```typescript
@@ -52,8 +61,10 @@ Subscribe to one or more events. Returns the `EventEmitter` instance for chainin
 Subscribe to a single event:
 
 ```javascript
-chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, (event) => {
-  console.log('Instrument changed:', event.value);
+chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, () => {
+  const inst = chart.instrument;   // always-correct, even if payload shape drifts
+  if (!inst?.id) return;
+  console.log('Instrument changed:', inst);
 }, this);
 ```
 

@@ -52,12 +52,14 @@
     // Listen for INSTRUMENT_CHANGED so you can see the event fire on
     // every successful assignment. If `id` were missing, equals() would
     // return true and this handler would never run.
-    chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, function (event) {
-      var oldSym = event.oldValue && event.oldValue.symbol;
-      var newSym = event.value && event.value.symbol;
-      var line = '[' + new Date().toLocaleTimeString() + '] INSTRUMENT_CHANGED: ' + oldSym + ' -> ' + newSym + ' (id=' + event.value.id + ')';
+    var previousSym = chart.instrument && chart.instrument.symbol;
+    chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, function () {
+      var inst = chart.instrument;
+      if (!inst || !inst.id) return;
+      var line = '[' + new Date().toLocaleTimeString() + '] INSTRUMENT_CHANGED: ' + previousSym + ' -> ' + inst.symbol + ' (id=' + inst.id + ')';
       var log = document.getElementById('eventLog');
       log.textContent = line + '\n' + log.textContent;
+      previousSym = inst.symbol;
     });
 
     function switchTo(key) {
