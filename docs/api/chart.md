@@ -1680,8 +1680,10 @@ Get the library version string.
 Constants for all events emitted by `Chart`. Use with the [EventEmitter](event-emitter.md) `on()` / `off()` methods.
 
 ```javascript
-chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, (event) => {
-  console.log('New instrument:', event.value.symbol);
+chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, () => {
+  const inst = chart.instrument;
+  if (!inst?.id) return;
+  console.log('New instrument:', inst.symbol);
 });
 ```
 
@@ -1785,9 +1787,16 @@ const chart = new FintaChart.Chart({
   },
 });
 
-// 2. Listen for events
-chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, (event) => {
-  console.log('Instrument changed from', event.oldValue?.symbol, 'to', event.value.symbol);
+// 2. Listen for events.
+//    For property-mirroring events (INSTRUMENT_CHANGED, TIME_FRAME_CHANGED, ...)
+//    read the chart's getter; the new value is committed before the event fires.
+//    event.oldValue is still useful when you need the previous value.
+let previousInstrument = chart.instrument;
+chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, () => {
+  const inst = chart.instrument;
+  if (!inst?.id) return;
+  console.log('Instrument changed from', previousInstrument?.symbol, 'to', inst.symbol);
+  previousInstrument = inst;
 });
 
 chart.on(FintaChart.ChartEvent.TIME_FRAME_CHANGED, (event) => {

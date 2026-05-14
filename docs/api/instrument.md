@@ -71,14 +71,14 @@ console.log(`Loaded ${instruments.length} instruments`);
 #### filter
 
 ```typescript
-static filter(symbol: string, filter?: string, page?: number, size?: number): Promise<IInstrument[]>
+static filter(query: string, filter?: string, page?: number, size?: number): Promise<IInstrument[]>
 ```
 
-Search instruments by symbol with optional filtering and pagination.
+Search instruments by symbol or company name with optional filtering and pagination. The toolbar search modal matches the query against both `instrument.symbol` and `instrument.company` (case-insensitive, alphanumeric-only normalization). Your implementation can do server-side filtering however you like — the modal applies a client-side substring re-check on both fields after results return.
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `symbol` | `string` | Symbol search string |
+| `query` | `string` | Search string — matched against symbol or company by the toolbar modal |
 | `filter` | `string` *(optional)* | Additional filter criteria |
 | `page` | `number` *(optional)* | Page number for paginated results |
 | `size` | `number` *(optional)* | Page size |

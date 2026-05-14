@@ -35,7 +35,7 @@ export function filterInstruments(query: string, exchanges?: string[]): Instrume
     const matchesQuery = !q
       || inst.symbol.toLowerCase().includes(q)
       || (inst.company || '').toLowerCase().includes(q);
-    const matchesExchange = !filterSet || filterSet.has(inst.exchange);
+    const matchesExchange = !filterSet || (inst.exchange ? filterSet.has(inst.exchange) : false);
     return matchesQuery && matchesExchange;
   });
 }

@@ -22,6 +22,13 @@
       <code>FintaChart.Instrument.filter</code>, <code>FintaChart.Instrument.filterById</code>,
       and <code>chart.exchanges()</code>.
     </p>
+    <p class="example-note">
+      <strong>Important:</strong> install <code>FintaChart.Instrument.filter</code> and
+      <code>FintaChart.Instrument.filterById</code> <em>before</em> constructing the chart.
+      The toolbar's <code>InstrumentSearch</code> instance can capture/bind these references
+      during the chart constructor; setting them after <code>new FintaChart.Chart(...)</code>
+      may produce a no-op modal.
+    </p>
   </div>
 
   <div id="chartContainer"></div>
@@ -100,25 +107,41 @@
     }
 
     // =======================================================================
-    // 3. Chart init
+    // 3. Static search-modal hooks — installed BEFORE chart construction.
+    //
+    //    The toolbar's InstrumentSearch can capture/bind these references
+    //    during the chart constructor; installing them after `new FC.Chart`
+    //    may produce a no-op modal. `chart.exchanges` is per-instance and
+    //    stays below the constructor.
+    //
+    //    Expected row shape returned to the modal (IInstrument):
+    //      { id: string, symbol: string, exchange: string, company: string,
+    //        type: string, tickSize: number }
+    //    The modal renders `symbol` in the first column and `company` in the
+    //    full-name column, and matches the user's query against both.
+    //
+    //    REST backends rarely match this shape verbatim — fields may arrive in
+    //    PascalCase (`SymbolId`, `ShortName`) or under different names
+    //    (`shortName`, `description`). If you wire `Instrument.filter` straight
+    //    to such a response, the company column renders blank and substring
+    //    search misses the full name. Map the response through a small
+    //    `normalise()` helper before returning, e.g.:
+    //
+    //      function normalise(r) {
+    //        var sid = r.symbolId || r.SymbolId || r.id || r.Id;
+    //        return {
+    //          id:       String(sid),
+    //          symbol:   r.symbol   || r.Symbol   || '',
+    //          exchange: r.exchange || r.Exchange || '',
+    //          company:  r.company  || r.Company  || r.shortName || r.ShortName
+    //                    || r.description || r.Description || '',
+    //          type:     r.type     || r.Type     || '',
+    //          tickSize: r.tickSize || r.TickSize || 0.01,
+    //        };
+    //      }
     // =======================================================================
 
-    var chart = new FintaChart.Chart({
-      container: '#chartContainer',
-      datafeed: new SearchDatafeed(),
-      instrument: instruments[0],
-      timeFrame: { interval: 1, periodicity: '' },
-      theme: defaultTheme,
-      showToolbar: true,        // toolbar exposes the search button
-      showScrollbar: true,
-      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes'],
-    });
-
-    // =======================================================================
-    // 4. Search modal hooks — the three integration points
-    // =======================================================================
-
-    // 4a. Instrument.filter — called by the search modal every keystroke and
+    // 3a. Instrument.filter — called by the search modal every keystroke and
     //     every time the user clicks an exchange tab. Receives the user's
     //     query, the active exchange filters (array of exchange codes), and
     //     pagination hints (page is 1-based, size is the page size). Return a
@@ -150,7 +173,7 @@
       return Promise.resolve(results);
     };
 
-    // 4b. Instrument.filterById — called when the modal needs the canonical
+    // 3b. Instrument.filterById — called when the modal needs the canonical
     //     IInstrument for an id (e.g. when a result is clicked, or when the
     //     chart restores from saved state). Always resolve to a fully-populated
     //     instrument, never null.
@@ -159,9 +182,27 @@
       return Promise.resolve(inst || instruments[0]);
     };
 
-    // 4c. chart.exchanges — drives the filter tabs at the top of the modal.
-    //     Return a static list, or compute it from your catalog. The tabs
-    //     appear in the order returned here.
+    // =======================================================================
+    // 4. Chart init
+    // =======================================================================
+
+    var chart = new FintaChart.Chart({
+      container: '#chartContainer',
+      datafeed: new SearchDatafeed(),
+      instrument: instruments[0],
+      timeFrame: { interval: 1, periodicity: '' },
+      theme: defaultTheme,
+      showToolbar: true,        // toolbar exposes the search button
+      showScrollbar: true,
+      supportedTimeFrames: ['1 Minutes', '5 Minutes', '15 Minutes'],
+    });
+
+    // =======================================================================
+    // 5. chart.exchanges — per-instance, drives the filter tabs at the top of
+    //    the modal. Return a static list, or compute it from your catalog.
+    //    The tabs appear in the order returned here.
+    // =======================================================================
+
     chart.exchanges = function () {
       return ['FOREX', 'NASDAQ', 'CRYPTO'];
     };

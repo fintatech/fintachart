@@ -377,3 +377,25 @@ chart.sendBarsRequest()
 | Stale bars from the previous instrument briefly visible | Previous request was not cancelled | Use `chart.sendBarsRequest()` instead of calling `datafeed.send()` directly — `sendBarsRequest()` cancels any in-flight request first |
 
 A complete working example is at [`examples/html/14-instrument-switching/`](../../examples/html/14-instrument-switching/).
+
+## Search modal: install hooks before chart construction
+
+The toolbar search modal's `InstrumentSearch` instance can capture/bind references to `FintaChart.Instrument.filter` and `FintaChart.Instrument.filterById` during chart construction. Installing the overrides **after** `new FintaChart.Chart(...)` may produce a no-op modal — the modal calls the original (typically empty) implementations and ignores your overrides. Verified empirically against 3.1.4.
+
+**Safe pattern:** set the static `Instrument.*` overrides before constructing the chart.
+
+```javascript
+// 1. Install Instrument.* hooks first — these are static on the Instrument
+//    namespace, so they don't depend on a chart instance existing.
+FintaChart.Instrument.filter     = async (query, filters, page, size) => { /* ... */ };
+FintaChart.Instrument.filterById = async (id) => { /* ... */ };
+
+// 2. Then construct the chart.
+const chart = new FintaChart.Chart({ container, datafeed, /* ... */ });
+
+// 3. chart.exchanges is per-instance and only meaningful after construction —
+//    safe to set here.
+chart.exchanges = () => ['FOREX', 'NASDAQ', 'CRYPTO'];
+```
+
+The race only affects the two static `Instrument.*` hooks — `chart.exchanges` and `INSTRUMENT_CHANGED` are per-instance and stay below the constructor as usual.
