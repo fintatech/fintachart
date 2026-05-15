@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.8] - 2026-05-15
+
+### Fixed
+
+- Minor bug fixes and improvements.
+
 ## [3.1.7] - 2026-05-14
 
 ### Added
@@ -117,6 +123,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.8]: https://github.com/fintatech/fintachart/releases/tag/v3.1.8
 [3.1.7]: https://github.com/fintatech/fintachart/releases/tag/v3.1.7
 [3.1.6]: https://github.com/fintatech/fintachart/releases/tag/v3.1.6
 [3.1.5]: https://github.com/fintatech/fintachart/releases/tag/v3.1.5
