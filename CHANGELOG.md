@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.9] - 2026-05-15
+
+### Fixed
+
+- Bar replay now preserves trailing future-projection placeholder bars instead of cutting them when replay engages, so forward-projecting indicators (e.g. composite cycle forecasts) keep their future slots and continue plotting ahead of the replay cursor (`ReplayModeManager`).
+
 ## [3.1.8] - 2026-05-15
 
 ### Fixed
@@ -123,6 +129,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.9]: https://github.com/fintatech/fintachart/releases/tag/v3.1.9
 [3.1.8]: https://github.com/fintatech/fintachart/releases/tag/v3.1.8
 [3.1.7]: https://github.com/fintatech/fintachart/releases/tag/v3.1.7
 [3.1.6]: https://github.com/fintatech/fintachart/releases/tag/v3.1.6
