@@ -110,7 +110,7 @@ chart.applyChartType('candle');
 
 ## Indicators
 
-Indicators are added through the `IndicatorFactory`. FintaChart ships with 114 built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
+Indicators are added through the `IndicatorFactory`. FintaChart ships with 130+ built-in indicator types covering moving averages, oscillators, volatility measures, volume studies, and more.
 
 ```javascript
 // Add a 20-period simple moving average to the price pane

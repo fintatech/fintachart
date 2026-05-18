@@ -5,7 +5,7 @@ FintaChart is a multi-platform financial charting component for web applications
 ## Key Features
 
 - **19 chart types** -- OHLC, Candle, Heikin Ashi, Renko, Kagi, Point & Figure, Line, Area, and more
-- **114 technical indicators** -- Moving averages, oscillators, volatility, volume, and custom indicators
+- **130+ technical indicators** -- Moving averages, oscillators, volatility, volume, and custom indicators
 - **Drawing tools** -- Trend lines, channels, rays, and freehand drawing
 - **Fibonacci tools** -- Retracements, extensions, fans, arcs, and time zones
 - **Trend analysis** -- Linear regression, trend channels, and speed resistance

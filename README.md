@@ -16,7 +16,7 @@ High-performance financial charting component for web applications. Designed for
 ## Features
 
 - **19 chart types** — Candlestick, OHLC, Heikin Ashi, Renko, Kagi, Line Break, Point & Figure, Hollow Candle, Range Bar, Candle Volume, Equi Volume, Line, Area, and more
-- **114 technical indicators** — RSI, MACD, Bollinger Bands, Ichimoku, EMA, SMA, Stochastics, and the full range of standard analysis tools
+- **130+ technical indicators** — RSI, MACD, Bollinger Bands, Ichimoku, EMA, SMA, Stochastics, and the full range of standard analysis tools
 - **Drawing and analysis tools** — Lines, channels, rectangles, circles, ellipses, polygons, freehand, arrows, text and image annotations
 - **Fibonacci tools** — Retracements, Fan, Extensions, Arcs, Ellipses, Time Zones
 - **Trend analysis** — Andrews' Pitchfork, Raff Regression, Error Channel, Gann Fan, Speed Lines, Quadrant Lines, Tirone Levels

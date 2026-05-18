@@ -16,7 +16,7 @@ A complete working example is at
 
 You probably want a custom indicator if any of the following is true:
 
-- The calculation you need isn't in the built-in set of 114.
+- The calculation you need isn't in the built-in set of 130+.
 - You need to combine multiple inputs (for example, an oscillator
   whose `+DI` and `-DI` lines feed each other).
 - You want to draw something the built-in plot styles can't express
