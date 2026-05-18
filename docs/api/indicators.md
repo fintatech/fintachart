@@ -192,7 +192,7 @@ String constants used with `EventEmitter.on()` / `EventEmitter.off()` to subscri
 
 ## Available Indicator Types
 
-The library ships with 114 built-in indicator types. Use the type name string with `IndicatorFactory.create()`.
+The library ships with 130+ built-in indicator types. Use the type name string with `IndicatorFactory.create()`.
 
 ### Trend & Moving Averages
 

@@ -20,7 +20,7 @@
 | [Shapes](api/shapes.md) | 30+ drawing tools and shape classes |
 | [Indicators](api/indicators.md) | Indicator base class, factory, events |
 | [Custom Indicators](api/custom-indicators.md) | Build your own — lifecycle, plots, parameters, registration |
-| [Indicator Parameters](api/indicator-params.md) | Per-indicator parameter reference (114 indicators) |
+| [Indicator Parameters](api/indicator-params.md) | Per-indicator parameter reference (130+ indicators) |
 | [DataRows](api/data-rows.md) | Data storage and manipulation |
 | [Scales](api/scales.md) | Vertical and horizontal scale configuration |
 | [Scale Internals](api/scale-internals.md) | Coordinate mapper, axis panes, formatters |
