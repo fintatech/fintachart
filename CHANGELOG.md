@@ -5,6 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.11] - 2026-07-06
+
+### Added
+
+- Position drawing shape: leverage-based position sizing. New `leverage` option on `PositionDrawingShape` (defaults to `1`) drives `Qty = (accountSize × leverage) / entryPrice` — stop distance no longer affects sizing. New calc outputs `accountTooSmall` / `minLotSize` (derived from `instrument.mappings[provider].minOrderSize / contractSize`), new `ShapeEvent.ACCOUNT_TOO_SMALL_CHANGED` event, and an in-canvas "Account size is too small for this instrument" warning. Settings dialog gains a Leverage input. Aligns with TradingView's position-tool sizing model.
+- **"Default"** button in the Indicator Settings dialog (`tcdIndicatorDialog_btn_default`) resets the indicator's parameters via a confirmation prompt: builds a fresh indicator of the same type, applies `resetDefaults()`, dispatches an `UpdateIndicatorCommand` (so the change is undoable), and rebuilds all tab controls without closing the dialog. Visibility tab is now also revealed when applicable.
+- `TradingTool.getDisplayedBidAsk(fallbackPrice?)` protected helper returning current `{ bid, ask }` from `chart.lastBid` / `chart.lastAsk`, falling back to the last close or supplied price when the live quote is missing or non-positive. Used by SL/TP validation for open positions.
+- New chart-level toast localization keys for the copy-image flow: `toolbar.snapshot.copyImageSuccess`, `toolbar.snapshot.copyImageDownloaded`, `toolbar.snapshot.copyImageFailed` (en, uk).
+- Draggable **OHLC card** overlay showing O/H/L/C plus **Volume** and **Change**, toggled from a new toolbar **"OHLC Cards"** menu. Ships five display variants — Compact, Outline, Compact Row, Bluetab, and Progress Bars — with an `open-OHLC-card` toolbar icon and en/uk localization (`OHLCCard`, `Pane`, `Toolbar`, `Draggable`).
+- Two new indicator parameters — **Multiplier** and **Box Ratio Smoothing** — exposed across the volume/flow indicators (AD Index, Chaikin Money Flow, Chaikin Oscillator, Ease of Movement, OBV, TRIX, Volume Oscillator), wired through `IndicatorParam` and the parameter-control factory with en/uk labels.
+- Pending-confirmation state for chart trading via `TradingTool.setDimmed(value)`: an order or position dims (its theme colors multiplied) while a placement or modification awaits backend confirmation, preventing duplicate actions. Take-profit and stop-loss lines are now also supported on open-position bars (`OrderBar`, `PositionBar`, `StopLoss`, `TakeProfit`, `TradingTool`).
+
+### Changed
+
+- Order-entry panel ("trade from the chart"): the quantity calculator gains preset value buttons populated from the instrument's static quantities plus a toggleable "set" action, and limit/stop inputs now seed through `NumericField.setValue` for correct tick formatting (`Toolbar`).
+- Stop-limit order rendering improved (`OrderBar`, `STTP`, `Chart`), with dedicated stop-limit color tokens added to all bundled themes (default, dark, fintatech dark, gray, olive, orange, purple, sky, teal).
+- Position drawing tool: Open P&L formula corrected, and its color rendering and context menu updated (`PositionDrawingShape`, `OrderBar`, `PositionShapeContextMenu`, en/uk).
+- Fibonacci drawing settings and drawing-template behavior reworked (`FibonacciShapeSettings`, `ShapeCoordinatePane`, `ShapeSettingsDragPane`, `ShapeTemplateSettings`, `ColorPicker`), including the templates drop-down styling.
+- Shape settings dialog restyled with updated drop-down handling and a refreshed "Points" modal (`ShapeSettingsDialog`, `ToolbarDropDownButton`).
+- Alert editing from the chart's trading context menu improved (`TradingContextMenu`).
+- `ChartSnapshotHandler.saveToClipboard()` rewritten: now uses the async `navigator.clipboard.write([new ClipboardItem({ 'image/png': blobPromise })])` pattern that satisfies Safari/Firefox's "user activation must be the same task as the write" rule. Adds a one-shot `window.focus` retry on `NotAllowedError: document is not focused`, a `clipboardUnavailableReason()` pre-check, and a graceful fallback that downloads the image and surfaces a `copyImageDownloaded` / `copyImageFailed` chart toast when the clipboard write cannot succeed. Fixes "Impossible to copy chart image" in the embedded widget.
+- SL/TP validation for an open position now clamps against the live bid/ask instead of the position's entry price (`PositionBar`, `StopLoss`, `TakeProfit`, `TradingTool`): longs require `SL < bid` and `TP > ask`; shorts require `SL > ask` and `TP < bid`. Shift-key bypass remains available only for pending orders — for positions, validation always runs. Out-of-range values now snap via `formatValue(...)` to honor tick precision.
+- Crosshair behavior on touch devices (`Chart.bindTouchPan`, `Pane`): when `crossHairType` is `CROSS` or `CROSS_BARS`, touch-pan is now disabled on `Chart` and pane drag short-circuits on mobile, so the crosshair stays put under the finger instead of scrolling the chart. Desktop crosshair drag is unaffected; the non-crosshair drag path no longer requires `PointerKind.MOUSE`, restoring touch-scroll parity when the crosshair is off.
+- Scroll-to-latest-bar, zoom hotkeys, and arrow-key panning now refresh with `primaryPane.isPreservingAutoScaling` instead of forcing auto-scale on every refresh (`Chart`, `HotkeysHandler`, `Pane`). The user's current vertical zoom is preserved across these actions when auto-scale has been opted out of.
+- Currency conversion in `TradingTool` simplified to `profitUSD = profitInQuote * rate`. Removed the prior USD-base branch that inverted the rate based on `conversionRate.symbol` (caused incorrect P/L when the conversion symbol parser misclassified the pair).
+- Instrument watermark now reads the exchange from `instrument.mappings[provider].exchange` and only appends the " - exchange" suffix when that mapping exists; missing `provider` / `mappings` no longer throws (`InstrumentWatermark`).
+- Mobile shape selection: tapping a selectable drawing now opens its settings pane — the previous `!UserAgent.isMobile` gate on `Shape.showSettingsPane()` blocked this on phones/tablets. Now gated on `selected && _shapeState !== MOVING` instead.
+- Mobile shape interaction: pane click now hides all shape tooltips first (so a stale tooltip can't intercept the next tap); long-press context menu uses `clickHitTest(point)` so the press only fires on the shape's hit region; touch-pan is suppressed only when the touch starts outside the panes frame or hits a shape. Toolbar drop-down buttons with children on mobile always toggle the dropdown on tap, regardless of which sub-target was hit.
+- Toolbar "remove all" interactions on mobile: lock-shapes button now calls `e.preventDefault()` so the click doesn't bubble to the dropdown and dismiss it before the action runs.
+- `Dialog.close()` preserves the prior `hotkeysEnabled` state when `_keyboardEnabledState` is null (`?? this.config.chart.hotkeysEnabled`), so closing a freshly-opened "reset to defaults" dialog no longer leaves hotkeys disabled.
+- `ChartSnapshotHandler` now reads `this.chart.rootDiv` directly (previously `this.chart.rootDiv.get(0)`, a leftover jQuery-style access) and removed the unused `MimeType.PNG` enum export.
+- Event-handler typing: `event.evt` is explicitly narrowed to `globalThis.MouseEvent` for the `shiftKey` check in `StopLoss` / `TakeProfit` to avoid a Konva ambient-type collision.
+
+### Fixed
+
+- Chart logo/asset now re-renders correctly when a chart is restored from saved state (`InstrumentWatermark`).
+- `Chart.restoreVisibleRange` now handles edge cases where the chart has few visible records.
+- Chart navigation: the timeframe picker and toolbar drop-down toggle no longer misbehave (`TimeFramePicker`, `ToolbarDropDownButton`).
+- Incorrect take-profit / stop-loss label behavior on the chart (`PositionTPSL`, `STTP`).
+- Chart-type selector failing to open on Chrome (`Toolbar`, `ToolbarDropDownButton`).
+- Incorrect chart behavior while the chart is inactive or backgrounded (`Chart`).
+- Mobile chart lag during history scrolling (`Chart`, `Pane`, `HorizontalAxis`, `RefreshOptimizer`).
+- Duplicated indicator title "frames" on the chart (`Chart`).
+- Assorted mobile chart-behavior fixes across dialogs, context menu, instrument search, and toolbar (`Chart`, `Dialog`, `ContextMenu`, `InstrumentSearch`, `Toolbar`).
+
 ## [3.1.10] - 2026-05-18
 
 ### Fixed
@@ -135,6 +180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.11]: https://github.com/fintatech/fintachart/releases/tag/v3.1.11
 [3.1.10]: https://github.com/fintatech/fintachart/releases/tag/v3.1.10
 [3.1.9]: https://github.com/fintatech/fintachart/releases/tag/v3.1.9
 [3.1.8]: https://github.com/fintatech/fintachart/releases/tag/v3.1.8
