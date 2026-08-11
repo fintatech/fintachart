@@ -5,6 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.12] - 2026-08-11
+
+### Added
+
+- Added **date-range presets bar** in the bottom toolbar (`1D 5D 1M 3M 6M YTD 1Y 5Y All` + a calendar button opening a **custom date range** popup with From/To inputs). Presets switch to a suitable timeframe (resolved against `supportedTimeFrames`) and show the requested period; the custom range auto-picks a timeframe targeting ~200 bars. New public API `Chart.setVisibleDateRange(startDate, endDate?, timeFrame?)` — loads missing history (batched `moreBars` requests) before applying the range; `startDate: null` shows all available history. New `calendar` SVG icon and `dateRange.*` localization keys (en, uk).
+- Custom in-house **date picker** for the date-range popup (`ToolbarCalendar`). The native `<input type="date">` fields are replaced with read-only text fields carrying a `calendar` icon and a themed calendar panel with month/year navigation, "Today" and "Clear" actions. New `dateRange.clear`, `dateRange.today`, `dateRange.months` and `dateRange.weekdaysShort` localization keys (en, uk).
+- Compact **drop-up menu** for the date range, shown whenever the inline preset chips no longer fit the bottom bar. Lists every preset with a descriptive hint (e.g. "5 days in 15 minutes intervals") plus a "Go to…" item that opens the custom-range popup. New `dateRange.label`, `dateRange.goto` and `dateRange.menu.*` localization keys (en, uk).
+- Mobile layout for the bottom toolbar: phones always get the drop-up menu (inline chips are too small as touch targets and never fit), and the bar gains responsive `tcdBarNarrow` (< 480 px) / `tcdBarTiny` (< 330 px) modes so the timezone selector shrinks instead of breaking the layout. A new `onDocumentTap` helper de-duplicates `touchend` / `click` (700 ms window) so a single tap doesn't both open and close the menu (`Toolbar`).
+- **Render Quality** setting (Low / Medium / High) in the Main Settings dialog (`tcdMainSettings_renderQuality`). Exposed as `Chart.renderQuality`, it caps device-pixel-ratio (`HtmlHelper.dprCap` → 1 / 2 / unlimited), scales `horizontalScale.maxVisibleBars` (base 750 mobile / 2000 desktop, ×0.5 / ×1 / ×1.5) and clamps `RefreshOptimizer.interval` (30 fps / 60 fps / native), trading sharpness for speed on weak devices. New `theme.dialog.renderQuality.*` localization keys (en, uk).
+- Indicator values in the **OHLC card**. New public `Indicator.hoverValues(record?)` returning one `IIndicatorHoverValue { name, color, value }` per plot (falling back to the last record when the hovered one is out of range). The primary pane's card lists every indicator on the chart, including those living on their own sub-panes; sub-pane cards list only their own. New `tcdOHLCCard_indicators*` style hooks (`Indicator`, `Pane`, `Toolbar`, `OHLCCard.scss`).
+- Shape rendering driven by indicator data: an indicator can now emit drawing shapes together with its values, including shapes arriving with real-time stream updates (`Indicator`).
+- **BBCode** parsing and rendering in text shapes — new `Utils/BBCode.ts` module wired into `TextShape`, so indicator-supplied and user text can carry inline markup.
+
+### Changed
+
+- Chart rendering optimization pass (`Chart`, `Pane`, `CanvasRenderer`, `CanvasLayer`, `RefreshOptimizer`, `DomUtils`): `window.resize` handling is now `requestAnimationFrame`-throttled behind a pending guard with `isDisposed` / `_rootDiv` checks; new throttled `Chart.refreshOnTickAsync()` (25 ms floor, called from `DatafeedCore`) keeps an active feed from forcing a full repaint every tick, and its timer is cleared in `dispose()`; bounding rects are cached via `DomUtils.cachedBoundingRect` (used by `CrossHairComponent` instead of `offsetWidth`, removing layout thrash); gradients are cached; wheel and move events accumulate before dispatch (`MouseWheelMotionEvent`, `MoveMotionEvent`); horizontal-scale ticks are built only for the visible window (`FloatingHorizontalAxisAdapter`).
+- `BarPlot.drawBars` accepts an optional `yCache: Float64Array[]`, so open/close/high/low pixel coordinates are computed once per repaint instead of calling `coordinateMapper.yByValue` per bar.
+- `TradingSessionHoursCheck()` re-enabled (`ChartTypeBase`) — the whole body had been commented out. RTH/ETH bar recalculation, the `TRADING_SESSION_UPDATE` event, indicator refresh and scale refresh work again.
+- Dev-only on-screen FPS / frame-time meter added to `Chart` (localhost and private IPs only) for rendering diagnostics.
+
+### Fixed
+
+- Flickering and initialization errors for charts in inactive (hidden) tabs (`Chart`, `HorizontalScale`). The `hasRenderSize()` guards were removed from `paint()`, `refresh()` and `InitializeVisualDimensions()` so a hidden chart still initializes and paints at 0 px — canvases, axes and renderers exist by the time positions or orders arrive in a background tab. `HorizontalScale` keeps the last valid column width instead of poisoning pixel→record conversions (and ignores pixel scrolls with an invalid width), and the hidden→visible transition refreshes synchronously so the first painted frame is already correct.
+- Trade label overlapping when several positions are on the chart (`PositionBar`, `PositionTPSL`, `STTP`, `OrderBar`, `OrderLabel`, `StopLoss`, `TakeProfit`, `HorizontalAxis`). The `kind` / `quantity` text widths were module-level globals shared by every position bar and are now per-instance fields.
+- OHLC cards could be dragged outside the chart and break; they are now clamped to the chart bounds (`Chart`, `Pane`, `Draggable`, `OHLCCard.scss`).
+- Volume bar normalization in the OHLC card (`Pane`).
+- Duplicate indicator "frames" appearing on save, caused by an unmanaged restore-indicators timer (`Chart`).
+- Incorrect rendering of shapes arriving with real-time indicator updates (`Indicator`, `TextShape`).
+- Incorrect parsing of numbers written with a thousand separator in the shape settings "Points" tab (`ShapeCoordinatePane`).
+- Horizontal-scale glitches when applying a custom date range (`Chart`, `FloatingHorizontalAxisAdapter`).
+- Assorted mobile fixes: compare-instrument settings, chart snapshot handling, pane interaction, shape templates, instrument search, toolbar drop-downs and drag panes (`CompareInstrumentSettings`, `ChartSnapshotHandler`, `Pane`, `ShapeTemplateSettings`, `InstrumentSearch`, `Toolbar`, `ToolbarDropDownButton`, `DragPane`, `Draggable`).
+
 ## [3.1.11] - 2026-07-06
 
 ### Added
@@ -180,6 +212,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.12]: https://github.com/fintatech/fintachart/releases/tag/v3.1.12
 [3.1.11]: https://github.com/fintatech/fintachart/releases/tag/v3.1.11
 [3.1.10]: https://github.com/fintatech/fintachart/releases/tag/v3.1.10
 [3.1.9]: https://github.com/fintatech/fintachart/releases/tag/v3.1.9
