@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.13] - 2026-08-26
+
+### Added
+
+- `toolbarHiddenItems` chart option — hides individual toolbar buttons and groups, addressed through the new `ToolbarItem` enum (array or `{ item: true }` map) and changeable at runtime via `Chart.setToolbarHiddenItems()` (`ToolbarItem`, `Toolbar`, `Chart`).
+- `ChartEvent.CLICKED` / `PaneEvent.CLICKED`, carrying an `IChartClickInfo` payload — pane, date, bar index, price, coordinates and the native event (`Chart`, `Pane`).
+- **Bar Marker** drawing shape: a dot or arrow with a text label pinned above or below a bar, with its own toolbar button and en/uk localization (`BarMarkerShape`).
+- `showIndicatorLegend` and `showCrossHairBarOffset` chart options — pin the indicator legend on/off regardless of chart width, and append the offset from the last bar to the crosshair's date label (`Chart`, `CrossHair`).
+- Line-plot projection: `projectionBarsCount` and `projectionType` (`trend`, `flat`, `damped`, `regression`, `sma`, `polynomial`) draw a dashed continuation of the line past the last bar (`LinePlot`, `Plot`).
+- **Properties** tab in the Indicator Settings dialog listing an indicator's boolean script properties; hidden when it has none (`IndicatorSettingsDialog`).
+- `Indicator.setTitleItems()` for script-supplied legend entries, `Plot.excludeFromAutoScale`, and `Chart.setMobileInputMode()` to switch between touch and mouse input at runtime.
+
+### Changed
+
+- Mobile performance pass: repaints capped to ~30 fps during gestures, throttled and batched `touchmove`, sub-pixel bar conflation, bounding-box pre-checks before geometry hit tests, and lighter event snapshots (`Chart`, `Pane`, `Shape`, `BarPlot`, `RefreshOptimizer`).
+- Indicator legend now renders the BBCode markup emitted by the script engine's `SetTitle` (`Indicator`).
+- Session filtering compares bars in exchange-local time instead of browser time; the unused "Hide Trading Hours" entry was removed from the Sessions menu (`BarCalculator`, `ChartTypeBase`, `Pane`) — [#640].
+- Custom script overlays on the price pane no longer take part in its auto-scale — a script plotting zeros used to drag the scale minimum to zero and lock the vertical axis (`Indicator`, `Plot`, `VerticalAxis`).
+- **Price Options** tab restored in the Main Settings dialog (`MainSettings`).
+
+### Fixed
+
+- Duplicate indicator shapes when a shape arrived with an id already on the chart (`Indicator`).
+- Crash on state restore for calculated series (`Plot`, `ChartTypeBase`).
+- Wrong scale ratio after restore — `VerticalAxis.restoreState()` read `minAllowedValueRatio` from `minAllowedValue`.
+- Context-menu submenus overflowing narrow (mobile) viewports (`ContextMenu`).
+- Axis labels left squashed after a HiDPI → 1x transition (`HtmlHelper`).
+
 ## [3.1.12] - 2026-08-11
 
 ### Added
@@ -212,6 +240,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.13]: https://github.com/fintatech/fintachart/releases/tag/v3.1.13
 [3.1.12]: https://github.com/fintatech/fintachart/releases/tag/v3.1.12
 [3.1.11]: https://github.com/fintatech/fintachart/releases/tag/v3.1.11
 [3.1.10]: https://github.com/fintatech/fintachart/releases/tag/v3.1.10
