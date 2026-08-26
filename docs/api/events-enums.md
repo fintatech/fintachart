@@ -67,6 +67,7 @@ Events fired by the `Chart` instance. Subscribe via `chart.on(ChartEvent.XXX, ha
 | `STAY_IN_SHAPE_MODE_CHANGED` | | Persistent shape-drawing mode toggled. |
 | `TIMEZONE_CHANGED` | | Active timezone changed. |
 | `TICK` | | A new tick received from the datafeed. |
+| `CLICKED` | `'chartClicked'` | User clicked on a pane; `event.value` holds the date / price under the pointer. |
 
 **Example**
 
@@ -104,6 +105,7 @@ Events fired by individual `Pane` instances.
 | `OBJECT_REMOVED` | A chart object removed from the pane. |
 | `DOUBLE_CLICKED` | Pane double-clicked. |
 | `CONTEXT_MENU` | Context menu opened on the pane. |
+| `CLICKED` | Pane clicked. `event.value` carries the date / price under the pointer — see [ChartEvent.CLICKED](chart.md#chartevent-clicked). |
 
 **Example**
 

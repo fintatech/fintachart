@@ -1761,6 +1761,7 @@ chart.on(FintaChart.ChartEvent.INSTRUMENT_CHANGED, () => {
 | `CHANGE_VISIBILITY_EXECUTION` | `'changeVisibilityExecution'` | Execution visibility changed |
 | `ORDER_FEATURES_CHANGED` | `'orderFeaturesChanged'` | Order features changed |
 | `LOGO_WATERMARK_CLICKED` | `'logoWatermarkClicked'` | Logo watermark clicked |
+| `CLICKED` | `'chartClicked'` | User clicked on a pane. Payload: [`IChartClickInfo`]
 
 ---
 

@@ -482,6 +482,7 @@ Use these constants to subscribe to pane-level events:
 | `PaneEvent.OBJECT_REMOVED` | Fired when a chart object is removed from the pane. |
 | `PaneEvent.DOUBLE_CLICKED` | Fired on double-click within the pane. |
 | `PaneEvent.CONTEXT_MENU` | Fired when the context menu is triggered within the pane. |
+| `PaneEvent.CLICKED` | Fired on click within the pane. `event.value` is an [`IChartClickInfo`](chart.md#chartevent-clicked) with the date and the price under the pointer. |
 
 ---
 
