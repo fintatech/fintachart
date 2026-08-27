@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.14] - 2026-08-27
+
+### Added
+
+- **Bar Marker** customization (`BarMarkerShape`): six additional glyphs on top of dot / arrow-up / arrow-down — `square`, `diamond`, `star`, `cross`, `line`, and `arrowAuto` (points down above a bar, up below it) — selected through the new `BarMarkerKind` enum.
+- Bar marker colouring: `markerColor` (new `BarMarkerColor` enum — `auto` follows the candle direction, seven presets, or `custom` paired with `customMarkerColor`) plus an optional `gradientFrom` / `gradientTo` gradient fill.
+- Bar marker badge styling: `badgeBorderRadius`, `badgeBorderColor`, `badgeBorderWidth`, `backgroundColor`, and `textColor`.
+- `connectLines` and `neighborSearchRange` on `BarMarkerShape` — `line` markers within the search range are joined by a connecting line, so a series of markers reads as a single path.
+- `anchorSource` (new `BarMarkerAnchor` enum — `high`, `low`, `open`, `close`, `point`) and `offsetY` on `BarMarkerShape`, controlling which value the marker attaches to and its distance from the bar. `position` also gains `auto`, placing the marker above or below by candle direction.
+- Text macros in the bar marker label — `{price}`, `{open}`, `{high}`, `{low}`, `{close}`, `{volume}`, `{time}` (`HH:mm`) and `{date}` (`YYYY-MM-DD`) are resolved against the bar the marker sits on (`BarMarkerShape.resolvedText`).
+- A **Bar Marker** section in the Shape Settings dialog exposing all of the above — marker type, colour (with a custom colour picker), gradient, badge radius / border / background / text colour and the connect-lines switch — with en and uk localization (`ShapeSettingsDialog`).
+
+### Changed
+
+- `BarMarkerPosition` and `BarMarkerKind` are now TypeScript enums instead of plain string-constant objects, and `position` / `marker` are typed with them. The string values are unchanged; TypeScript consumers assigning raw string literals should switch to the enum members.
+- Bar markers adapt to the chart type: line and area charts default to the `line` glyph with connecting lines enabled, and Point & Figure charts anchor markers to the P&F columns instead of the raw OHLC rows (`BarMarkerShape`).
+
 ## [3.1.13] - 2026-08-26
 
 ### Added
@@ -240,6 +257,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.14]: https://github.com/fintatech/fintachart/releases/tag/v3.1.14
 [3.1.13]: https://github.com/fintatech/fintachart/releases/tag/v3.1.13
 [3.1.12]: https://github.com/fintatech/fintachart/releases/tag/v3.1.12
 [3.1.11]: https://github.com/fintatech/fintachart/releases/tag/v3.1.11
