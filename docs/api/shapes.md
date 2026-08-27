@@ -344,6 +344,97 @@ Determines which price field the magnet targets.
 | `TextShape` | Text label at a fixed position |
 | `NoteShape` | Anchored note with text content |
 | `BalloonShape` | Callout balloon with pointer |
+| `BarMarkerShape` | Glyph plus text badge attached to a specific bar |
+
+### BarMarkerShape options
+
+`BarMarkerShape` extends `TextShape`. It snaps to the nearest bar when placed and renders a marker glyph with a text badge above or below that bar. All options below are accepted in `IBarMarkerShapeConfig` / `IBarMarkerShapeOptions` and exposed as get/set accessors.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `text` | `string` | `'E'` | Badge label. Supports macros — see below |
+| `position` | [`BarMarkerPosition`](#barmarkerposition) | `AUTO` | Whether the marker sits above or below the bar |
+| `marker` | [`BarMarkerKind`](#barmarkerkind) | `DOT` | Marker glyph. Defaults to `LINE` on line and area charts |
+| `markerColor` | [`BarMarkerColor`](#barmarkercolor) | `AUTO` | Preset marker colour, `AUTO` (candle direction) or `CUSTOM` |
+| `customMarkerColor` | `string` | `''` | Colour used when `markerColor` is `CUSTOM` |
+| `gradientFrom` | `string` | `''` | Gradient start colour for the glyph fill |
+| `gradientTo` | `string` | `''` | Gradient end colour for the glyph fill |
+| `anchorSource` | [`BarMarkerAnchor`](#barmarkeranchor) | `HIGH` | Bar value the marker is anchored to. Left unset, the high is used above the bar and the low below it |
+| `offsetY` | `number` | `0` | Extra distance in pixels between the bar and the marker |
+| `badgeBorderRadius` | `number` | `3` | Corner radius of the text badge; `0` draws a square badge |
+| `badgeBorderColor` | `string` | `''` | Badge border colour; empty draws no border |
+| `badgeBorderWidth` | `number` | `1` | Badge border width in pixels |
+| `backgroundColor` | `string` | `'rgba(0, 0, 0, 0.75)'` | Badge background colour |
+| `textColor` | `string` | `'#ffffff'` | Badge text colour |
+| `connectLines` | `boolean` | `false` | Joins neighbouring `LINE` markers with a connecting line. Defaults to `true` on line and area charts |
+| `neighborSearchRange` | `number` | `10` | How many bars to either side are searched for a marker to connect to |
+
+#### Text macros
+
+`BarMarkerShape.resolvedText` returns `text` with the following macros replaced by values from the bar the marker is attached to. Unknown tokens are left as-is.
+
+| Macro | Value |
+|-------|-------|
+| `{price}` | Price of the marker's anchor point |
+| `{open}` `{high}` `{low}` `{close}` | OHLC values of the bar |
+| `{volume}` | Bar volume |
+| `{time}` | Bar time as `HH:mm` |
+| `{date}` | Bar date as `YYYY-MM-DD` |
+
+#### BarMarkerPosition
+
+| Value | Description |
+|-------|-------------|
+| `AUTO` | Above up (bullish) bars, below down bars |
+| `ABOVE` | Always above the bar |
+| `BELOW` | Always below the bar |
+
+#### BarMarkerKind
+
+| Value | Description |
+|-------|-------------|
+| `DOT` | Filled circle |
+| `ARROW_UP` | Upward triangle |
+| `ARROW_DOWN` | Downward triangle |
+| `ARROW_AUTO` | Points down when the marker is above the bar, up when below |
+| `SQUARE` | Filled square |
+| `DIAMOND` | Filled diamond |
+| `STAR` | Five-pointed star |
+| `CROSS` | Stroked X |
+| `LINE` | Horizontal dash; the only glyph that participates in `connectLines` |
+
+#### BarMarkerColor
+
+| Value | Description |
+|-------|-------------|
+| `AUTO` | Follows the candle direction, using the chart theme's up/down candle colours |
+| `RED` `GREEN` `ORANGE` `BLUE` `YELLOW` `PURPLE` `WHITE` | Preset colours |
+| `CUSTOM` | Uses `customMarkerColor` |
+
+#### BarMarkerAnchor
+
+| Value | Description |
+|-------|-------------|
+| `HIGH` | Bar high |
+| `LOW` | Bar low |
+| `OPEN` | Bar open |
+| `CLOSE` | Bar close |
+| `POINT` | The shape's own anchor point value |
+
+```javascript
+const marker = new FintaChart.BarMarkerShape({
+  text: 'Earnings {close}',
+  marker: FintaChart.BarMarkerKind.ARROW_AUTO,
+  markerColor: FintaChart.BarMarkerColor.CUSTOM,
+  customMarkerColor: '#7e57c2',
+  anchorSource: FintaChart.BarMarkerAnchor.HIGH,
+  offsetY: 6,
+  badgeBorderRadius: 8,
+});
+
+marker.points = [new FintaChart.DataPoint({ date: barDate, value: barClose })];
+chart.primaryPane.addShape(marker);
+```
 
 ### Drawing
 
