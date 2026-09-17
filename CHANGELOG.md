@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.15] - 2026-09-17
+
+### Added
+
+- **Plot areas for any indicator.** `Indicator.addPlotArea(name1, name2, aboveColor, belowColor)` now remembers the two plots it fills between instead of resolving Ichimoku's `Senkou Span A` / `Senkou Span B` by name, so a custom or script-driven indicator can declare a cloud of its own. `aboveColor` paints the segments where the first series is above the second one. New `Indicator.removePlotArea()` detaches it again — the pair is replaceable at runtime, which is what a script result needs. A fill whose plots no longer exist hides itself instead of throwing.
+- **Per-plot displacement.** `Indicator.setPlotDisplacement(name, bars)` shifts a single plot along the time axis — positive into the future (as Senkou spans do), negative into the past (as Chikou Span does) — for both the line and any area drawn between displaced plots. Ichimoku keeps its built-in behaviour unchanged when nothing is set.
+- **Script bar repaint.** `Indicator.setBarStyles()` / `upsertBarStyles()` / `clearBarStyles()` recolor individual bars by timestamp (`IScriptBarStyle`). Overrides are removed with the indicator and are not saved into the chart state.
+- **Script panel background.** `Indicator.setPanelStyle()` / `clearPanelStyle()` paint a flat or gradient background on the indicator's pane, the price pane or the whole chart without changing the theme (`IScriptPanelStyle`).
+- `ITradingSessionRange.timezone` — exchange timezone for the session filter; the chart timezone is used as a fallback.
+
+### Changed
+
+- Built-in indicators (SMA, EMA, WMA, MACD, RSI, CCI, ATR and others) skip `NaN` input values instead of producing `NaN` for the rest of the series.
+- Faster shape rendering and hover handling: cached geometry and theme, off-screen culling, throttled free-hand drawing (`Shape`, `Pane`).
+
+### Fixed
+
+- Script shifted after the end of trading hours: the RTH filter is now re-applied to appended bars and loaded history (`Chart`, `ChartTypeBase`).
+- Session filter: the chart scrolls to the last bar after switching sessions; chart checkbox styles no longer affect the host page.
+- Picture-in-Picture mode: dialogs, context menus, dropdowns and tooltips now open in the chart's window instead of the main page.
+- Wrong pane position after dragging a pane splitter; the splitter could not be dragged on touch devices while panning was active (`PanesContainer`).
+- Event listener leaks when adding and removing indicators and shapes (`HotkeysHandler`, `Indicator`, `Shape`).
+
 ## [3.1.14] - 2026-08-27
 
 ### Added
@@ -257,6 +280,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.15]: https://github.com/fintatech/fintachart/releases/tag/v3.1.15
 [3.1.14]: https://github.com/fintatech/fintachart/releases/tag/v3.1.14
 [3.1.13]: https://github.com/fintatech/fintachart/releases/tag/v3.1.13
 [3.1.12]: https://github.com/fintatech/fintachart/releases/tag/v3.1.12
