@@ -166,7 +166,7 @@ interface IEnvironmentTheme {
 
 ## Built-in Themes
 
-FintaChart includes 10 ready-made themes:
+FintaChart includes 10 ready-made themes. Each one ships as its own script under `scripts/themes/`, for example `scripts/themes/darkTheme.js`. `FintaChart.Themes.<name>`, `FintaChart.Theme.<Name>` and `FintaChart.Themes.byName()` return `null` for a theme whose script the page has not loaded.
 
 | Theme Name | Key Characteristics |
 |---|---|

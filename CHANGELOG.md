@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.16] - 2026-10-06
+
+### Added
+
+- `Chart.touchScrollSpeed` — one-finger pan speed on touch devices, where `1` tracks the finger exactly. Default `0.6`; throws for values that are not finite or not greater than zero.
+- `Chart.isPinchActive` / `Chart.setPinchActive()` — whether a two-finger pinch owns the current touch sequence. While it does, panning, shape dragging and the long-tap context menu stand down. A watchdog releases it if the final `touchend` is lost.
+- `PinchMotionEvent` — two-finger pinch handler used by panes and the time axis. It reports `scale` (relative to gesture start), `scaleDelta` and `center`, and can be tuned with `minDistance` / `minScaleStep` (`IMotionEventPinchConfig`).
+- `Chart.refreshIndicatorsFrom(startIndex)` and `Indicator.refreshFrom(startIndex)` — recalculate indicators from a bar index and keep the values before it.
+- `HorizontalScale.isTouchZooming` — whether a pinch zoom is in progress.
+
+### Changed
+
+- `HorizontalScale.handlePinchZoom()` now takes `(scale, anchorRatio)` — the scale relative to gesture start and the pinch midpoint across the plot from `0` to `1` — instead of two `Touch` objects.
+- `MouseWheelMotionEvent` now handles the mouse wheel only. Touch pinch moved to `PinchMotionEvent`.
+- Faster indicator updates. When bars are appended, only the new tail is recalculated (going back by the indicator's period) instead of the whole series. Hidden indicators, and indicators on a pane hidden behind a maximized one, put off recalculation until they are shown again (`Indicator`).
+- Smoother one-finger panning on mobile. Touch moves are processed at about 30 fps instead of 20, and movement below a pixel carries over to the next frame instead of being dropped (`Chart`).
+
+### Removed
+
+- `HorizontalScale.initialTouchDistance` — use `HorizontalScale.isTouchZooming` instead.
+
+### Fixed
+
+- Script indicators flickering on every realtime tick. A realtime update re-declares the fill area with `removePlotArea()` + `addPlotArea()` and refreshes the indicator in a later frame, so the frame painted in between had no area; a refresh also re-inserted the line plots after the area, so the area alternated between being drawn under and over the lines. `removePlotArea()` now takes effect on the next `refresh()` (adding the same pair again before that keeps the plot), and the area is always painted under the lines (`Indicator`).
+- A `values` access inside `onInitializeIndicator()` advanced the current bar on every refresh but the first, leaving the first bars of every plot at zero (`Indicator.refresh`).
+- Script titles and other pixel-anchored script shapes were drawn from the top of the pane, underneath the pane legend (instrument title and indicator rows). They are now laid out below the legend and follow it when its height changes (`Indicator`).
+- The indicator settings dialog did not open for indicators with more than three plots, script indicators in the first place: the default style factory had captions for one to three plots only and threw for the rest, and it counted the fill area as a line plot. Plots beyond three are now captioned with their series name and fill areas are skipped (`PlotStyleControlFactory`).
+- Text labels emitted by a script (Buy@ / Sell@ and the like) overlapped each other when the signals were close. The visible labels of an indicator are now laid out before painting and stacked downwards where they would intersect (`Indicator`, `TextShape`, `Pane`).
+- Pinch-to-zoom on mobile devices was erratic (#50). It zoomed around the centre of the visible range instead of the fingers, drifted as the fingers moved, panned the chart at the same time and could open the long-tap context menu. The bar under the fingers now stays pinned for the whole gesture, and zoom stays within the scale's visible-bar limits. The chart container now sets `touch-action: none`, so the browser (iOS Safari included) no longer page-zooms or scrolls the page over the chart. A cancelled touch (`touchcancel`) no longer leaves the chart unable to pan (`Chart`, `HorizontalScale`, `HorizontalAxis`, `Pane`, `MoveMotionEvent`, `ContextMenuMotionEvent`).
+- The chart jumped back to the last bar while it was dragged into history that could not be loaded yet. A declined history request re-applied the session filter and scrolled the view to the last bar (`Chart.requestMoreBars`, `ChartTypeBase.TradingSessionHoursCheck`).
+- On HiDPI screens canvas content could be drawn at the wrong scale after a resize that kept the canvas size. The device-pixel-ratio transform is now re-applied on every resize (`HtmlHelper`).
+- Order, position, stop-loss and take-profit tags were misplaced when the left price scale was shown, and so were their quantity click areas (`OrderBar`, `OrderLabel`, `PositionBar`, `PositionTPSL`, `STTP`, `TradingTool`).
+- The logo watermark was drawn under the left price scale. It now starts at the plot area (`Pane`).
+- `FintaChart.Themes.<name>`, `FintaChart.Theme.<Name>` and `Themes.byName()` threw a `ReferenceError` when the page had not loaded that theme's script. They now return `null` (`Theme`).
+- Toolbar dropdowns (the time frame picker and other toolbar menus) overflowed past the bottom of the chart and under the bottom toolbar (#662). They are now kept inside the chart area: a dropdown shrinks to the room below the button, or opens upwards when there is not enough room below (`ToolbarDropDownButton`, `TimeFramePicker`).
+
 ## [3.1.15] - 2026-09-17
 
 ### Added
@@ -280,6 +316,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release of `@fintatech/fintachart`
 
+[3.1.16]: https://github.com/fintatech/fintachart/releases/tag/v3.1.16
 [3.1.15]: https://github.com/fintatech/fintachart/releases/tag/v3.1.15
 [3.1.14]: https://github.com/fintatech/fintachart/releases/tag/v3.1.14
 [3.1.13]: https://github.com/fintatech/fintachart/releases/tag/v3.1.13
