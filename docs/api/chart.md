@@ -176,6 +176,8 @@ Get/set properties exposed on a `Chart` instance.
 | `mouseEventsEnabled` | `boolean` | get/set | Whether mouse events are processed. Fires `ENABLE_MOUSE_EVENTS_CHANGED`. |
 | `scrollEnabled` | `boolean` | get/set | Whether horizontal scrolling is allowed. |
 | `zoomEnabled` | `boolean` | get/set | Whether zooming is allowed. |
+| `touchScrollSpeed` | `number` | get/set | One-finger pan speed on touch devices, where `1` tracks the finger exactly. Must be finite and greater than `0`. Default: `0.6`. |
+| `isPinchActive` | `boolean` | get | Whether a two-finger pinch owns the current touch sequence. Panning stands down while it is `true`. |
 
 ### OHLC and grid
 
@@ -492,6 +494,20 @@ Recalculate and repaint all indicators.
 
 ---
 
+#### refreshIndicatorsFrom
+
+```typescript
+refreshIndicatorsFrom(startIndex: number): void
+```
+
+Recalculate all indicators from a bar index, keeping the values before it. Each indicator goes back by its period so that values depending on earlier bars stay correct. A `startIndex` of `0` or less recalculates everything, like `refreshIndicators()`.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `startIndex` | `number` | Index of the first bar whose value changed |
+
+---
+
 ### Panes
 
 #### addPane
@@ -730,6 +746,20 @@ Zoom in or out by a number of records.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `records` | `number` | Positive to zoom in, negative to zoom out |
+
+---
+
+#### setPinchActive
+
+```typescript
+setPinchActive(active: boolean): void
+```
+
+Mark whether a two-finger pinch owns the current touch sequence. The built-in pinch handling calls this, so you only need it for custom gesture handling. While a pinch is active, one-finger panning stops. If no further call arrives within 600 ms, the flag clears itself so that a lost `touchend` cannot block panning. Clearing it also resets the horizontal scale's pinch state.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `active` | `boolean` | `true` while two touches drive a pinch |
 
 ---
 

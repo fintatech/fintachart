@@ -66,6 +66,7 @@ See also: [Panes API](panes.md) | [VerticalScale](#verticalscale)
 | `allowPartialRecords` | `boolean` | get / set | When `true`, records that are only partially visible at the edges are rendered. |
 | `autoScrollMode` | `HorizontalAxisAutoScrollMode` | get / set | Determines when auto-scrolling occurs (see [HorizontalAxisAutoScrollMode](#horizontalaxisautoscrollmode)). |
 | `autoScrollKind` | `HorizontalAxisAutoScrollKind` | get / set | Determines the auto-scroll trigger condition (see [HorizontalAxisAutoScrollKind](#horizontalaxisautoscrollkind)). |
+| `isTouchZooming` | `boolean` | readonly | `true` while a two-finger pinch zoom is in progress. |
 
 ---
 

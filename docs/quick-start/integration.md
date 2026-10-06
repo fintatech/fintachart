@@ -133,7 +133,7 @@ For mobile apps, embed FintaChart inside a WebView (Android WebView, iOS WKWebVi
 Key considerations:
 
 - **Viewport meta tag** -- Include `<meta name="viewport" content="width=device-width, initial-scale=1.0">` so the chart scales correctly on high-DPI screens.
-- **Touch events** -- The library handles pinch-to-zoom, panning, and long-press gestures out of the box. No additional configuration is required.
+- **Touch events** -- The library handles pinch-to-zoom, panning, and long-press gestures out of the box. The chart container sets `touch-action: none`, so the browser does not scroll or zoom the page while a gesture is on the chart. To change the one-finger pan speed, set `chart.touchScrollSpeed` (`1` tracks the finger exactly; default `0.6`).
 - **Responsive sizing** -- Set the chart container to percentage-based dimensions (`width: 100%; height: 100%`) and listen for orientation changes or resize events to call `chart.update()`.
 - **Performance** -- On lower-end devices, consider reducing the number of visible data points or disabling expensive indicators to maintain smooth frame rates.
 
